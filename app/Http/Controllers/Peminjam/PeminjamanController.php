@@ -36,7 +36,7 @@ class PeminjamanController extends Controller
             return back()->withErrors(['jumlah' => 'Jumlah permintaan melebihi stok tersedia.']);
         }
 
-        Peminjaman::create([
+        $peminjaman = Peminjaman::create([
             'user_id' => Auth::id(),
             'alat_id' => $request->alat_id,
             'tanggal_pengajuan' => now(),
@@ -46,6 +46,8 @@ class PeminjamanController extends Controller
             'keperluan' => $request->keperluan,
             'status' => 'pending',
         ]);
+
+        \App\Models\LogAktivitas::catat(Auth::id(), 'REQUEST', 'peminjaman', null, $peminjaman->toArray());
 
         return redirect()->route('peminjam.peminjaman.index')->with('success', 'Pengajuan peminjaman berhasil dikirim. Menunggu persetujuan petugas.');
     }

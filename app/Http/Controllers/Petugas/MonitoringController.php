@@ -39,6 +39,8 @@ class MonitoringController extends Controller
             'tanggal_peminjaman' => now(), // Set to actual pickup time
         ]);
 
+        \App\Models\LogAktivitas::catat(Auth::id(), 'PICKUP', 'peminjaman', null, $peminjaman->toArray());
+
         return back()->with('success', 'Barang berhasil diambil (Status: Dipinjam).');
     }
 
@@ -82,7 +84,7 @@ class MonitoringController extends Controller
 
         DB::transaction(function() use ($peminjaman, $request, $total_denda, $keterlambatan_hari) {
             // Create Pengembalian record
-            Pengembalian::create([
+            $pengembalian = Pengembalian::create([
                 'peminjaman_id' => $peminjaman->id,
                 'tanggal_kembali_aktual' => now(),
                 'kondisi_alat' => $request->kondisi_akhir,
@@ -98,13 +100,14 @@ class MonitoringController extends Controller
             ]);
 
             // Increment stock
-            // Assuming simplified logic: always increment available stock
             $peminjaman->alat->increment('jumlah_tersedia', $peminjaman->jumlah);
             
             // If unique item (count 1), update condition
             if ($peminjaman->alat->jumlah_total == 1) {
                 $peminjaman->alat->update(['kondisi' => $request->kondisi_akhir]);
             }
+
+            \App\Models\LogAktivitas::catat(Auth::id(), 'RETURN', 'pengembalian', null, $pengembalian->toArray());
         });
 
         return redirect()->route('petugas.monitoring.index')->with('success', 'Pengembalian berhasil diproses. Total Denda: Rp ' . number_format($total_denda));

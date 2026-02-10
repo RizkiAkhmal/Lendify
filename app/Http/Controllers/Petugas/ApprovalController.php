@@ -39,6 +39,8 @@ class ApprovalController extends Controller
             
             // Decrement stock upon approval to reserve the item
             $peminjaman->alat->decrement('jumlah_tersedia', $peminjaman->jumlah);
+
+            \App\Models\LogAktivitas::catat(Auth::id(), 'APPROVE', 'peminjaman', null, $peminjaman->toArray());
         });
 
         return back()->with('success', 'Peminjaman disetujui. Stok alat dikurangi.');
@@ -59,6 +61,8 @@ class ApprovalController extends Controller
             'petugas_id' => Auth::id(),
             'catatan_petugas' => $request->catatan_petugas,
         ]);
+
+        \App\Models\LogAktivitas::catat(Auth::id(), 'REJECT', 'peminjaman', null, $peminjaman->toArray());
 
         return back()->with('success', 'Peminjaman ditolak.');
     }
