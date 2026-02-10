@@ -45,6 +45,8 @@ class UserController extends Controller
 
         event(new Registered($user));
 
+        \App\Models\LogAktivitas::catat(auth()->id(), 'CREATE', 'users', null, $user->toArray());
+
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
 
@@ -74,12 +76,16 @@ class UserController extends Controller
 
         $user->save();
 
+        \App\Models\LogAktivitas::catat(auth()->id(), 'UPDATE', 'users', null, $user->toArray());
+
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
     }
 
     public function destroy(User $user)
     {
+        $oldData = $user->toArray();
         $user->delete();
+        \App\Models\LogAktivitas::catat(auth()->id(), 'DELETE', 'users', $oldData, null);
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
     }
 }

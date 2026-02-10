@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Peminjaman Alat') }}</title>
+        <title>{{ config('app.name', 'Lendify') }}</title>
 
         <!-- Google Fonts: Inter -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -67,7 +67,7 @@
                             <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        <span class="ml-3 text-xl font-bold text-white uppercase tracking-wider">SIPEMA</span>
+                        <span class="ml-3 text-xl font-bold text-white uppercase tracking-wider">LENDIFY</span>
                     </div>
                 </div>
 
