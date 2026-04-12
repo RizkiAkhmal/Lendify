@@ -4,20 +4,39 @@
     </x-slot>
 
     <div class="card-metronic overflow-hidden">
-        <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center bg-white gap-4">
-            <div class="relative w-full sm:w-64">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none">
-                        <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                    </svg>
-                </span>
-                <input type="text" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#009ef7] text-sm" placeholder="Cari pengguna...">
-            </div>
-            
-            <a href="{{ route('admin.users.create') }}" class="w-full sm:w-auto px-6 py-2 bg-[#009ef7] text-white rounded-lg font-bold hover:bg-[#0086d1] transition shadow-sm flex items-center justify-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                Tambah Pengguna
-            </a>
+        <div class="p-6 border-b border-gray-100 bg-white">
+            <form method="GET" action="{{ route('admin.users.index') }}" class="flex flex-col sm:flex-row gap-3 items-center">
+                <div class="relative flex-grow w-full">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none">
+                            <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        </svg>
+                    </span>
+                    <input type="text" name="search" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#009ef7] text-sm" placeholder="Cari nama atau email..." value="{{ request('search') }}">
+                </div>
+
+                <select name="role" class="w-full sm:w-48 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-[#009ef7] text-sm cursor-pointer">
+                    <option value="">Semua Role</option>
+                    <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                    <option value="petugas" {{ request('role') == 'petugas' ? 'selected' : '' }}>Petugas</option>
+                    <option value="peminjam" {{ request('role') == 'peminjam' ? 'selected' : '' }}>Peminjam</option>
+                </select>
+
+                <button type="submit" class="w-full sm:w-auto px-6 py-2 bg-gray-900 text-white rounded-lg font-bold hover:bg-gray-700 transition text-sm">
+                    Filter
+                </button>
+
+                @if(request('search') || request('role'))
+                    <a href="{{ route('admin.users.index') }}" class="w-full sm:w-auto px-4 py-2 bg-gray-100 text-gray-600 rounded-lg font-bold hover:bg-gray-200 transition text-sm text-center">
+                        Reset
+                    </a>
+                @endif
+
+                <a href="{{ route('admin.users.create') }}" class="w-full sm:w-auto px-6 py-2 bg-[#009ef7] text-white rounded-lg font-bold hover:bg-[#0086d1] transition shadow-sm flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                    Tambah Pengguna
+                </a>
+            </form>
         </div>
 
         <div class="overflow-x-auto">

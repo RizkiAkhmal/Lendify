@@ -20,10 +20,10 @@
                 </div>
             @endif
 
-            <!-- Section 1: Siap Diambil (Approved) -->
+            <!-- Section 1: Siap Diambil -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
                 <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-bold mb-4 text-blue-700">1. Siap Diambil (Approved)</h3>
+                    <h3 class="text-lg font-bold mb-4 text-blue-700">1. Siap Diambil </h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-blue-50">
@@ -65,7 +65,7 @@
             <!-- Section 2: Sedang Dipinjam -->
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-bold mb-4 text-indigo-700">2. Sedang Dipinjam (Active Loans)</h3>
+                    <h3 class="text-lg font-bold mb-4 text-indigo-700">2. Sedang Dipinjam </h3>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-indigo-50">

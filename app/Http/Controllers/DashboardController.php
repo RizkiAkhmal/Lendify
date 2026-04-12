@@ -21,13 +21,25 @@ class DashboardController extends Controller
             'rusak' => Alat::where('kondisi', 'rusak_berat')->count(),
         ];
 
-        $latestActivities = LogAktivitas::with('user')->latest()->take(5)->get();
-        
-        // Jika log kosong, ambil peminjaman terbaru sebagai fallback
-        if ($latestActivities->isEmpty()) {
-            $latestActivities = Peminjaman::with('user', 'alat')->latest()->take(5)->get();
+        // Data khusus per role
+        $latestActivities = collect();
+        $alatTersedia = collect();
+
+        if ($user->role === 'peminjam') {
+            // Peminjam: ambil alat tersedia
+            $alatTersedia = Alat::with('kategori')
+                ->tersedia()
+                ->latest()
+                ->take(8)
+                ->get();
+        } else {
+            // Admin & Petugas: ambil log aktivitas
+            $latestActivities = LogAktivitas::with('user')->latest()->take(5)->get();
+            if ($latestActivities->isEmpty()) {
+                $latestActivities = Peminjaman::with('user', 'alat')->latest()->take(5)->get();
+            }
         }
 
-        return view('dashboard', compact('user', 'stats', 'latestActivities'));
+        return view('dashboard', compact('user', 'stats', 'latestActivities', 'alatTersedia'));
     }
 }
