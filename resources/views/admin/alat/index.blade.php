@@ -15,6 +15,10 @@
             </div>
             
             <div class="flex items-center space-x-2 w-full sm:w-auto">
+                <a href="{{ route('admin.alat.export') }}" class="flex-1 sm:flex-none px-6 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition shadow-sm flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Export CSV
+                </a>
                 <a href="{{ route('admin.alat.create') }}" class="flex-1 sm:flex-none px-6 py-2 bg-[#009ef7] text-white rounded-lg font-bold hover:bg-[#0086d1] transition shadow-sm flex items-center justify-center">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                     Tambah Alat
@@ -26,6 +30,7 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-[#f9fafb] text-gray-400 uppercase text-[11px] font-bold tracking-wider">
+                        <th class="px-6 py-4">No</th>
                         <th class="px-6 py-4">Informasi Alat</th>
                         <th class="px-6 py-4">Kategori</th>
                         <th class="px-6 py-4">Stok</th>
@@ -36,6 +41,9 @@
                 <tbody class="divide-y divide-gray-100 bg-white">
                     @forelse($alats as $alat)
                         <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 text-sm font-semibold text-gray-500">
+                                {{ ($alats->currentPage() - 1) * $alats->perPage() + $loop->iteration }}
+                            </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
                                     <div class="w-12 h-12 rounded-lg bg-gray-100 mr-4 overflow-hidden flex-shrink-0">
@@ -60,13 +68,25 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex flex-col">
-                                    <div class="flex items-center space-x-2">
-                                        <span class="text-sm font-bold text-gray-700">{{ $alat->jumlah_tersedia }}</span>
-                                        <span class="text-xs text-gray-400">/ {{ $alat->jumlah_total }}</span>
+                                    <div class="flex items-center justify-between w-32">
+                                        <div class="flex flex-col">
+                                            <span class="text-xs text-gray-400 uppercase font-bold">Ready</span>
+                                            <span class="text-sm font-black text-gray-800">{{ $alat->jumlah_tersedia }}</span>
+                                        </div>
+                                        <div class="flex flex-col items-end">
+                                            <span class="text-xs text-gray-400 uppercase font-bold">Rusak</span>
+                                            <span class="text-sm font-black text-red-500">{{ $alat->jumlah_rusak }}</span>
+                                        </div>
                                     </div>
-                                    <div class="w-24 h-1.5 bg-gray-100 rounded-full mt-1 overflow-hidden">
-                                        <div class="h-full bg-[#009ef7] rounded-full" style="width: {{ ($alat->jumlah_tersedia / max($alat->jumlah_total, 1)) * 100 }}%"></div>
+                                    <div class="w-32 h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden flex">
+                                        @php
+                                            $readyWidth = ($alat->jumlah_tersedia / max($alat->jumlah_total, 1)) * 100;
+                                            $rusakWidth = ($alat->jumlah_rusak / max($alat->jumlah_total, 1)) * 100;
+                                        @endphp
+                                        <div class="h-full bg-[#009ef7]" style="width: {{ $readyWidth }}%"></div>
+                                        <div class="h-full bg-red-400" style="width: {{ $rusakWidth }}%"></div>
                                     </div>
+                                    <span class="text-[9px] text-gray-400 mt-1">Total: {{ $alat->jumlah_total }} Unit</span>
                                 </div>
                             </td>
                             <td class="px-6 py-4">
@@ -84,6 +104,11 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex justify-center items-center space-x-2">
+                                    @if($alat->jumlah_rusak > 0)
+                                        <a href="{{ route('admin.alat.repair.show', $alat) }}" class="p-2 rounded-lg bg-red-50 text-red-400 hover:text-red-600 hover:bg-red-100 transition" title="Selesaikan Perbaikan">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        </a>
+                                    @endif
                                     <a href="{{ route('admin.alat.show', $alat) }}" class="p-2 rounded-lg bg-gray-50 text-gray-400 hover:text-[#009ef7] hover:bg-blue-50 transition">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     </a>

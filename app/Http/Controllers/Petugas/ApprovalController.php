@@ -12,12 +12,17 @@ class ApprovalController extends Controller
 {
     public function index()
     {
-        $peminjaman = Peminjaman::with(['user', 'alat'])
+        $pending = Peminjaman::with(['user', 'alat'])
             ->where('status', 'pending')
             ->latest()
-            ->paginate(10);
+            ->get();
+
+        $ready = Peminjaman::with(['user', 'alat'])
+            ->where('status', 'approved')
+            ->latest()
+            ->get();
             
-        return view('petugas.approval.index', compact('peminjaman'));
+        return view('petugas.approval.index', compact('pending', 'ready'));
     }
 
     public function approve(Peminjaman $peminjaman)
@@ -37,13 +42,30 @@ class ApprovalController extends Controller
                 'petugas_id' => Auth::id(),
             ]);
             
-            // Decrement stock upon approval to reserve the item
+            // Stock reduction happens once at approval point
             $peminjaman->alat->decrement('jumlah_tersedia', $peminjaman->jumlah);
 
             \App\Models\LogAktivitas::catat(Auth::id(), 'APPROVE', 'peminjaman', null, $peminjaman->toArray());
         });
 
-        return back()->with('success', 'Peminjaman disetujui. Stok alat dikurangi.');
+        return back()->with('success', 'Peminjaman disetujui. Stok alat telah dikurangi.');
+    }
+
+    public function pickup(Peminjaman $peminjaman)
+    {
+        if ($peminjaman->status !== 'approved') {
+            return back()->with('error', 'Status peminjaman bukan approved.');
+        }
+
+        // Update status to 'dipinjam' and record actual pickup time
+        $peminjaman->update([
+            'status' => 'dipinjam',
+            'tanggal_peminjaman' => now(), // Set to actual pickup time
+        ]);
+
+        \App\Models\LogAktivitas::catat(Auth::id(), 'PICKUP', 'peminjaman', null, $peminjaman->toArray());
+
+        return back()->with('success', 'Barang berhasil diambil (Status: Dipinjam). Monitoring sekarang fokus pada pengembalian.');
     }
 
     public function reject(Request $request, Peminjaman $peminjaman)

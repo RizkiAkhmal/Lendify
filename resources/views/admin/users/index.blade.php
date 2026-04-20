@@ -32,6 +32,11 @@
                     </a>
                 @endif
 
+                <a href="{{ route('admin.users.export') }}" class="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition shadow-sm flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Export CSV
+                </a>
+
                 <a href="{{ route('admin.users.create') }}" class="w-full sm:w-auto px-6 py-2 bg-[#009ef7] text-white rounded-lg font-bold hover:bg-[#0086d1] transition shadow-sm flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                     Tambah Pengguna
@@ -43,7 +48,7 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-[#f9fafb] text-gray-400 uppercase text-[11px] font-bold tracking-wider">
-                        <th class="px-6 py-4">ID</th>
+                        <th class="px-6 py-4">No</th>
                         <th class="px-6 py-4">Nama & Email</th>
                         <th class="px-6 py-4">Role</th>
                         <th class="px-6 py-4 text-center">Status</th>
@@ -54,7 +59,7 @@
                     @forelse($users as $user)
                         <tr class="hover:bg-gray-50 transition">
                             <td class="px-6 py-4 text-sm font-semibold text-gray-500">
-                                #{{ $user->id }}
+                                {{ ($users->currentPage() - 1) * $users->perPage() + $loop->iteration }}
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center">

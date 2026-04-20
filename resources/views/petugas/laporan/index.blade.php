@@ -37,7 +37,6 @@
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Peminjam</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Alat</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tgl Pinjam</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tgl Kembali</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Terlambat</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Denda</th>
@@ -49,8 +48,7 @@
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item->user->name }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->alat->nama_alat }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->tanggal_peminjaman->format('d/m/Y') }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->tanggal_kembali_aktual ? $item->tanggal_kembali_aktual->format('d/m/Y') : '-' }}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->pengembalian->tanggal_kembali_aktual ? $item->pengembalian->tanggal_kembali_aktual->format('d/m/Y') : '-' }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm {{ ($item->pengembalian->keterlambatan_hari ?? 0) > 0 ? 'text-red-600 font-bold' : 'text-gray-500' }}">
                                             {{ $item->pengembalian->keterlambatan_hari ?? 0 }} hari
                                         </td>
@@ -63,7 +61,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">Tidak ada data laporan.</td>
+                                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">Tidak ada data laporan.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

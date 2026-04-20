@@ -20,64 +20,28 @@
                 </div>
             @endif
 
-            <!-- Section 1: Siap Diambil -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
-                <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-bold mb-4 text-blue-700">1. Siap Diambil </h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-blue-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Peminjam</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Alat</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rencana Pinjam</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse($approved as $item)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item->user->name }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->alat->nama_alat }} ({{ $item->jumlah }})</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $item->tanggal_peminjaman->format('d/m/Y') }} s/d {{ $item->tanggal_kembali_rencana->format('d/m/Y') }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <form action="{{ route('petugas.monitoring.pickup', $item) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="return confirm('Konfirmasi pengambilan barang?')">
-                                                    Barang Diambil
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="4" class="px-6 py-4 text-center text-gray-500">Tidak ada barang yang siap diambil.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+            <div class="space-y-8">
+                <!-- Sedang Dipinjam -->
+                <div class="card-metronic overflow-hidden">
+                    <div class="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center bg-white gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800">Sedang Dipinjam</h3>
+                            <p class="text-xs text-gray-400">Daftar alat yang sedang aktif digunakan</p>
+                        </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Section 2: Sedang Dipinjam -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h3 class="text-lg font-bold mb-4 text-indigo-700">2. Sedang Dipinjam </h3>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-indigo-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Peminjam</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Alat</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tgl Kembali (Rencana)</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status Telat</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Action</th>
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#f9fafb] text-gray-400 uppercase text-[11px] font-bold tracking-wider">
+                                    <th class="px-6 py-4">Peminjam</th>
+                                    <th class="px-6 py-4">Alat</th>
+                                    <th class="px-6 py-4">Tgl Kembali</th>
+                                    <th class="px-6 py-4">Status</th>
+                                    <th class="px-6 py-4 text-right">Tindakan</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tbody class="divide-y divide-gray-100 bg-white">
                                 @forelse($dipinjam as $item)
                                     @php
                                         $telat = $item->hitungKeterlambatan();

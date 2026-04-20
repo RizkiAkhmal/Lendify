@@ -66,8 +66,16 @@
                         <!-- Jumlah Total -->
                         <div class="mt-4">
                             <x-input-label for="jumlah_total" :value="__('Jumlah Total')" />
-                            <x-text-input id="jumlah_total" class="block mt-1 w-full" type="number" name="jumlah_total" :value="old('jumlah_total')" required min="1" />
+                            <x-text-input id="jumlah_total" class="block mt-1 w-full" type="number" name="jumlah_total" :value="old('jumlah_total', 1)" required min="0" />
                             <x-input-error :messages="$errors->get('jumlah_total')" class="mt-2" />
+                        </div>
+
+                        <!-- Jumlah Rusak -->
+                        <div class="mt-4">
+                            <x-input-label for="jumlah_rusak" :value="__('Jumlah Unit Rusak')" />
+                            <x-text-input id="jumlah_rusak" class="block mt-1 w-full" type="number" name="jumlah_rusak" :value="old('jumlah_rusak', 0)" required min="0" />
+                            <p class="text-xs text-gray-400 mt-1 italic">Unit yang sedang dalam masa perbaikan/rusak sejak awal.</p>
+                            <x-input-error :messages="$errors->get('jumlah_rusak')" class="mt-2" />
                         </div>
 
                         <!-- Foto -->

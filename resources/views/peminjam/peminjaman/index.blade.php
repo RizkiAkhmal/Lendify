@@ -60,6 +60,43 @@
                                 <span class="px-3 py-1 rounded-md text-[10px] font-black uppercase tracking-wider {{ $statusColor }}">
                                     {{ $item->status }}
                                 </span>
+
+                                @if($item->status === 'selesai' && $item->pengembalian)
+                                    <div class="mt-3 space-y-1 bg-gray-50 p-2 rounded-lg border border-gray-100 shadow-sm">
+                                        @if($item->pengembalian->kondisi_alat !== 'baik')
+                                            <div class="flex justify-between items-center text-[9px]">
+                                                <span class="text-gray-400 font-bold uppercase">Kondisi</span>
+                                                <span class="text-red-500 font-black uppercase">{{ str_replace('_', ' ', $item->pengembalian->kondisi_alat) }}</span>
+                                            </div>
+                                        @endif
+                                        
+                                        @php
+                                            $dendaTelat = ($item->pengembalian->keterlambatan_hari ?? 0) * 5000;
+                                            $dendaRusak = ($item->pengembalian->denda ?? 0) - $dendaTelat;
+                                        @endphp
+
+                                        @if($dendaTelat > 0)
+                                            <div class="flex justify-between items-center text-[9px]">
+                                                <span class="text-gray-400 uppercase">Denda Telat</span>
+                                                <span class="text-gray-700 font-bold">Rp {{ number_format($dendaTelat, 0, ',', '.') }}</span>
+                                            </div>
+                                        @endif
+                                        
+                                        @if($dendaRusak > 0)
+                                            <div class="flex justify-between items-center text-[9px]">
+                                                <span class="text-gray-400 uppercase">Denda Rusak</span>
+                                                <span class="text-gray-700 font-bold">Rp {{ number_format($dendaRusak, 0, ',', '.') }}</span>
+                                            </div>
+                                        @endif
+                                        
+                                        @if($item->pengembalian->denda > 0)
+                                            <div class="flex justify-between items-center text-[10px] border-t border-gray-200 pt-1 mt-1">
+                                                <span class="font-bold text-gray-800 uppercase">Total</span>
+                                                <span class="font-black text-[#009ef7]">Rp {{ number_format($item->pengembalian->denda, 0, ',', '.') }}</span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endif
                             </td>
                             <td class="px-6 py-4">
                                 <p class="text-xs text-gray-600 italic line-clamp-1 max-w-[200px]" title="{{ $item->keperluan }}">

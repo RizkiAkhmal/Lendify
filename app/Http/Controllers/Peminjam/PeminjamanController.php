@@ -12,7 +12,7 @@ class PeminjamanController extends Controller
 {
     public function index()
     {
-        $peminjaman = Peminjaman::with('alat')
+        $peminjaman = Peminjaman::with(['alat', 'pengembalian'])
             ->where('user_id', Auth::id())
             ->latest()
             ->paginate(10);

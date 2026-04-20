@@ -23,21 +23,36 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Admin routes
     Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('users/export', [Admin\UserController::class, 'export'])->name('users.export');
         Route::resource('users', Admin\UserController::class);
-        Route::resource('kategori', Admin\KategoriController::class);
+        
+        Route::get('alat/export', [Admin\AlatController::class, 'export'])->name('alat.export');
+        Route::get('alat/{alat}/repair', [Admin\AlatController::class, 'showRepair'])->name('alat.repair.show');
+        Route::post('alat/{alat}/repair', [Admin\AlatController::class, 'postRepair'])->name('alat.repair');
         Route::resource('alat', Admin\AlatController::class);
+        
+        Route::resource('kategori', Admin\KategoriController::class);
+        
+        Route::get('peminjaman/export', [Admin\PeminjamanController::class, 'export'])->name('peminjaman.export');
+        Route::get('peminjaman/{peminjaman}/invoice', [Admin\PeminjamanController::class, 'invoice'])->name('peminjaman.invoice');
         Route::resource('peminjaman', Admin\PeminjamanController::class);
+        
+        Route::get('pengembalian/export', [Admin\PengembalianController::class, 'export'])->name('pengembalian.export');
         Route::resource('pengembalian', Admin\PengembalianController::class);
+        
         Route::get('log-aktivitas', [Admin\LogAktivitasController::class, 'index'])->name('log.index');
     });
     
     // Petugas routes
     Route::middleware(['role:petugas'])->prefix('petugas')->name('petugas.')->group(function () {
+        Route::get('katalog', [Petugas\KatalogController::class, 'index'])->name('katalog.index');
+        Route::get('katalog/{alat}', [Petugas\KatalogController::class, 'show'])->name('katalog.show');
+        
         Route::get('approval', [Petugas\ApprovalController::class, 'index'])->name('approval.index');
         Route::post('approval/{peminjaman}/approve', [Petugas\ApprovalController::class, 'approve'])->name('approval.approve');
         Route::post('approval/{peminjaman}/reject', [Petugas\ApprovalController::class, 'reject'])->name('approval.reject');
         Route::get('monitoring', [Petugas\MonitoringController::class, 'index'])->name('monitoring.index');
-        Route::post('monitoring/{peminjaman}/pickup', [Petugas\MonitoringController::class, 'pickup'])->name('monitoring.pickup');
+        Route::post('approval/{peminjaman}/pickup', [Petugas\ApprovalController::class, 'pickup'])->name('approval.pickup');
         Route::get('monitoring/{peminjaman}/return', [Petugas\MonitoringController::class, 'returnForm'])->name('monitoring.return.form');
         Route::post('monitoring/{peminjaman}/return', [Petugas\MonitoringController::class, 'pengembalian'])->name('monitoring.return');
         Route::get('laporan', [Petugas\LaporanController::class, 'index'])->name('laporan.index');

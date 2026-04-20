@@ -41,12 +41,18 @@
                                 
                                 <div class="mb-4">
                                     <x-input-label for="kondisi_akhir" :value="__('Kondisi Alat Saat Kembali')" />
-                                    <select id="kondisi_akhir" name="kondisi_akhir" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" required onchange="calculateTotal()">
-                                        <option value="baik" data-denda="0">Baik (Tanpa Denda)</option>
-                                        <option value="rusak_ringan" data-denda="50000">Rusak Ringan (Denda Rp 50.000)</option>
-                                        <option value="rusak_berat" data-denda="200000">Rusak Berat (Denda Rp 200.000)</option>
+                                    <select id="kondisi_akhir" name="kondisi_akhir" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" required onchange="toggleDendaField()">
+                                        <option value="baik">Baik</option>
+                                        <option value="rusak_ringan">Rusak Ringan</option>
+                                        <option value="rusak_berat">Rusak Berat</option>
                                     </select>
                                     <x-input-error :messages="$errors->get('kondisi_akhir')" class="mt-2" />
+                                </div>
+
+                                <div id="denda_kerusakan_wrapper" class="mb-4" style="display: none;">
+                                    <x-input-label for="denda_kerusakan" :value="__('Denda Kerusakan')" />
+                                    <x-text-input id="denda_kerusakan" name="denda_kerusakan" type="number" class="block mt-1 w-full" value="0" min="0" required oninput="calculateTotal()" />
+                                    <x-input-error :messages="$errors->get('denda_kerusakan')" class="mt-2" />
                                 </div>
 
                                 <div class="mb-4">
@@ -58,6 +64,9 @@
                                     <div class="flex justify-between items-center font-bold text-lg">
                                         <span>Total Denda Bayar:</span>
                                         <span id="total_bayar">Rp {{ number_format($denda_keterlambatan, 0, ',', '.') }}</span>
+                                    </div>
+                                    <div id="denda_detail" class="text-[10px] text-gray-500 mt-1">
+                                        * Denda Telat: Rp {{ number_format($denda_keterlambatan, 0, ',', '.') }}
                                     </div>
                                 </div>
 
@@ -76,17 +85,42 @@
     </div>
 
     <script>
+        function toggleDendaField() {
+            const kondisi = document.getElementById('kondisi_akhir').value;
+            const wrapper = document.getElementById('denda_kerusakan_wrapper');
+            const inputDenda = document.getElementById('denda_kerusakan');
+            
+            if (kondisi === 'rusak_ringan' || kondisi === 'rusak_berat') {
+                wrapper.style.display = 'block';
+            } else {
+                wrapper.style.display = 'none';
+                inputDenda.value = 0;
+            }
+            calculateTotal();
+        }
+
         function calculateTotal() {
             const dendaTelat = {{ $denda_keterlambatan }};
-            const select = document.getElementById('kondisi_akhir');
-            const dendaRusak = parseInt(select.options[select.selectedIndex].getAttribute('data-denda'));
+            const inputDendaRusak = document.getElementById('denda_kerusakan');
+            const dendaRusak = parseInt(inputDendaRusak.value) || 0;
             
             const total = dendaTelat + dendaRusak;
             
             // Format Rupiah
-            const formatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(total);
+            const formatted = new Intl.NumberFormat('id-ID', { 
+                style: 'currency', 
+                currency: 'IDR', 
+                minimumFractionDigits: 0 
+            }).format(total);
             
             document.getElementById('total_bayar').textContent = formatted;
+
+            // Update detail text
+            let detailText = `* Denda Telat: Rp {{ number_format($denda_keterlambatan, 0, ',', '.') }}`;
+            if (dendaRusak > 0) {
+                detailText += ` + Denda Kerusakan: Rp ${new Intl.NumberFormat('id-ID').format(dendaRusak)}`;
+            }
+            document.getElementById('denda_detail').textContent = detailText;
         }
     </script>
 </x-app-layout>

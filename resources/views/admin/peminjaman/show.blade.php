@@ -42,7 +42,7 @@
                             <div class="bg-gray-50 p-4 rounded-lg grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <p class="text-sm text-gray-600">Tanggal Pinjam</p>
-                                    <p class="font-semibold">{{ $peminjaman->tanggal_pinjam }}</p>
+                                    <p class="font-semibold">{{ $peminjaman->tanggal_peminjaman ? $peminjaman->tanggal_peminjaman->format('d M Y') : '-' }}</p>
                                 </div>
                                 <div>
                                     <p class="text-sm text-gray-600">Rencana Kembali</p>
@@ -50,7 +50,7 @@
                                 </div>
                                 <div>
                                     <p class="text-sm text-gray-600">Tanggal Kembali Aktual</p>
-                                    <p class="font-semibold">{{ $peminjaman->tanggal_kembali_aktual ?? '-' }}</p>
+                                    <p class="font-semibold">{{ $peminjaman->pengembalian->tanggal_kembali_aktual ? $peminjaman->pengembalian->tanggal_kembali_aktual->format('d M Y') : '-' }}</p>
                                 </div>
                                 <div>
                                     <p class="text-sm text-gray-600">Status</p>
@@ -65,36 +65,21 @@
                                     </span>
                                 </div>
                                 <div class="col-span-2">
-                                    <p class="text-sm text-gray-600">Keterangan</p>
-                                    <p class="font-semibold">{{ $peminjaman->keterangan ?? '-' }}</p>
+                                    <p class="text-sm text-gray-600">Keterangan/Keperluan</p>
+                                    <p class="font-semibold">{{ $peminjaman->keperluan ?? '-' }}</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Admin Action -->
-                        <div class="md:col-span-2 border-t pt-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">Admin Action</h3>
-                            <form action="{{ route('admin.peminjaman.update', $peminjaman) }}" method="POST" class="flex items-end gap-4">
-                                @csrf
-                                @method('PUT')
-                                <div class="w-full md:w-1/3">
-                                    <x-input-label for="status" :value="__('Change Status Manually')" />
-                                    <select id="status" name="status" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-                                        <option value="pending" {{ $peminjaman->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                        <option value="approved" {{ $peminjaman->status == 'approved' ? 'selected' : '' }}>Approved</option>
-                                        <option value="dipinjam" {{ $peminjaman->status == 'dipinjam' ? 'selected' : '' }}>Dipinjam</option>
-                                        <option value="selesai" {{ $peminjaman->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                                        <option value="rejected" {{ $peminjaman->status == 'rejected' ? 'selected' : '' }}>Rejected</option>
-                                    </select>
-                                </div>
-                                <x-primary-button>Update Status</x-primary-button>
-                            </form>
-                            <p class="text-xs text-red-500 mt-2">* Warning: Changing status manually here might bypass some stock validation logic. Use with caution.</p>
-                        </div>
+
                     </div>
 
-                    <div class="mt-8 flex justify-end">
-                        <a href="{{ route('admin.peminjaman.index') }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Back to List</a>
+                    <div class="mt-8 flex justify-end gap-3">
+                        <a href="{{ route('admin.peminjaman.invoice', $peminjaman) }}" class="px-5 py-2 bg-[#009ef7] text-white rounded-md font-bold hover:bg-[#0086d1] transition shadow-sm flex items-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                            Print Invoice
+                        </a>
+                        <a href="{{ route('admin.peminjaman.index') }}" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-md font-bold hover:bg-gray-300 transition">Back to List</a>
                     </div>
                 </div>
             </div>

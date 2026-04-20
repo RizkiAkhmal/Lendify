@@ -14,34 +14,12 @@ class MonitoringController extends Controller
 {
     public function index()
     {
-        $approved = Peminjaman::with(['user', 'alat'])
-            ->where('status', 'approved')
-            ->latest()
-            ->get();
-
         $dipinjam = Peminjaman::with(['user', 'alat'])
             ->where('status', 'dipinjam')
             ->latest()
             ->get();
 
-        return view('petugas.monitoring.index', compact('approved', 'dipinjam'));
-    }
-
-    public function pickup(Peminjaman $peminjaman)
-    {
-        if ($peminjaman->status !== 'approved') {
-            return back()->with('error', 'Status peminjaman bukan approved.');
-        }
-
-        // Update status to 'dipinjam' and record actual pickup time
-        $peminjaman->update([
-            'status' => 'dipinjam',
-            'tanggal_peminjaman' => now(), // Set to actual pickup time
-        ]);
-
-        \App\Models\LogAktivitas::catat(Auth::id(), 'PICKUP', 'peminjaman', null, $peminjaman->toArray());
-
-        return back()->with('success', 'Barang berhasil diambil (Status: Dipinjam).');
+        return view('petugas.monitoring.index', compact('dipinjam'));
     }
 
     public function returnForm(Peminjaman $peminjaman)
@@ -64,21 +42,14 @@ class MonitoringController extends Controller
 
         $request->validate([
             'kondisi_akhir' => 'required|in:baik,rusak_ringan,rusak_berat',
+            'denda_kerusakan' => 'required|numeric|min:0',
             'catatan' => 'nullable|string',
         ]);
 
         $denda_keterlambatan = $peminjaman->hitungDendaKeterlambatan();
         $keterlambatan_hari = $peminjaman->hitungKeterlambatan();
         
-        $denda_kerusakan = 0;
-        switch ($request->kondisi_akhir) {
-            case 'rusak_ringan':
-                $denda_kerusakan = 50000;
-                break;
-            case 'rusak_berat':
-                $denda_kerusakan = 200000;
-                break;
-        }
+        $denda_kerusakan = $request->denda_kerusakan;
 
         $total_denda = $denda_keterlambatan + $denda_kerusakan;
 
@@ -99,8 +70,12 @@ class MonitoringController extends Controller
                 'tanggal_kembali_aktual' => now()
             ]);
 
-            // Increment stock
-            $peminjaman->alat->increment('jumlah_tersedia', $peminjaman->jumlah);
+            // Stock management based on condition
+            if ($request->kondisi_akhir === 'baik') {
+                $peminjaman->alat->increment('jumlah_tersedia', $peminjaman->jumlah);
+            } else {
+                $peminjaman->alat->increment('jumlah_rusak', $peminjaman->jumlah);
+            }
             
             // If unique item (count 1), update condition
             if ($peminjaman->alat->jumlah_total == 1) {

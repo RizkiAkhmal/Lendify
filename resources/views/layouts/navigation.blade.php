@@ -29,9 +29,9 @@
                         <x-nav-link :href="route('admin.peminjaman.index')" :active="request()->routeIs('admin.peminjaman.*')">
                             {{ __('Peminjaman') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('admin.pengembalian.index')" :active="request()->routeIs('admin.pengembalian.*')">
+                        {{-- <x-nav-link :href="route('admin.pengembalian.index')" :active="request()->routeIs('admin.pengembalian.*')">
                             {{ __('Pengembalian') }}
-                        </x-nav-link>
+                        </x-nav-link> --}}
                          <x-nav-link :href="route('admin.log.index')" :active="request()->routeIs('admin.log.*')">
                             {{ __('Log') }}
                         </x-nav-link>
@@ -44,9 +44,9 @@
                         <x-nav-link :href="route('petugas.monitoring.index')" :active="request()->routeIs('petugas.monitoring.*')">
                             {{ __('Monitoring') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('petugas.laporan.index')" :active="request()->routeIs('petugas.laporan.*')">
+                        {{-- <x-nav-link :href="route('petugas.laporan.index')" :active="request()->routeIs('petugas.laporan.*')">
                             {{ __('Laporan') }}
-                        </x-nav-link>
+                        </x-nav-link> --}}
                     @endif
 
                     @if(Auth::user()->role === 'peminjam')

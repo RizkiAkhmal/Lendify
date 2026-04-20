@@ -12,7 +12,7 @@ class AlatController extends Controller
 {
     public function index()
     {
-        $alats = Alat::with('kategori')->latest()->paginate(10);
+        $alats = Alat::with('kategori')->oldest()->paginate(10);
         return view('admin.alat.index', compact('alats'));
     }
 
@@ -31,12 +31,14 @@ class AlatController extends Controller
             'merk' => ['nullable', 'string', 'max:100'],
             'spesifikasi' => ['nullable', 'string'],
             'kondisi' => ['required', 'in:baik,rusak_ringan,rusak_berat'],
-            'jumlah_total' => ['required', 'integer', 'min:1'],
+            'jumlah_total' => ['required', 'integer', 'min:0'],
+            'jumlah_rusak' => ['required', 'integer', 'min:0'],
             'foto' => ['nullable', 'image', 'max:2048'], // 2MB Max
         ]);
 
         $data = $request->all();
-        $data['jumlah_tersedia'] = $request->jumlah_total; // Initially same as total
+        // Initial available = total - initially broken
+        $data['jumlah_tersedia'] = max(0, $request->jumlah_total - $request->jumlah_rusak);
 
         if ($request->hasFile('foto')) {
             $path = $request->file('foto')->store('alat', 'public');
@@ -68,19 +70,22 @@ class AlatController extends Controller
             'merk' => ['nullable', 'string', 'max:100'],
             'spesifikasi' => ['nullable', 'string'],
             'kondisi' => ['required', 'in:baik,rusak_ringan,rusak_berat'],
-            'jumlah_total' => ['required', 'integer', 'min:1'],
+            'jumlah_total' => ['required', 'integer', 'min:0'],
+            'jumlah_rusak' => ['required', 'integer', 'min:0'],
             'foto' => ['nullable', 'image', 'max:2048'],
         ]);
 
-        $data = $request->except(['jumlah_tersedia']); // Don't manually update available quantity easily here, requires logic
+        $data = $request->all();
 
-        // Adjust jumlah_tersedia if jumlah_total changes
-        // Logic: new_available = old_available + (new_total - old_total)
-        $diff = $request->jumlah_total - $alat->jumlah_total;
-        $data['jumlah_tersedia'] = $alat->jumlah_tersedia + $diff;
+        // Calculate changes
+        $diffTotal = $request->jumlah_total - $alat->jumlah_total;
+        $diffRusak = $request->jumlah_rusak - $alat->jumlah_rusak;
+
+        // Formula: New Available = Old Available + (Change in Total) - (Change in Broken)
+        $data['jumlah_tersedia'] = $alat->jumlah_tersedia + $diffTotal - $diffRusak;
 
         if ($data['jumlah_tersedia'] < 0) {
-             return back()->with('error', 'Cannot deduce total below currently borrowed amount.');
+             return back()->withInput()->withErrors(['jumlah_rusak' => 'Penyesuaian gagal: Stok tersedia tidak mencukupi (melebihi unit yang sedang dipinjam).']);
         }
 
         if ($request->hasFile('foto')) {
@@ -108,5 +113,67 @@ class AlatController extends Controller
         
         $alat->delete();
         return redirect()->route('admin.alat.index')->with('success', 'Alat deleted successfully.');
+    }
+
+    public function export()
+    {
+        $alats = Alat::with('kategori')->get();
+        $filename = "alat-" . date('Y-m-d') . ".csv";
+        $handle = fopen('php://memory', 'w');
+        fputcsv($handle, ['ID', 'Kode Alat', 'Nama Alat', 'Kategori', 'Merk', 'Kondisi', 'Stok Total', 'Stok Tersedia', 'Stok Rusak']);
+
+        foreach ($alats as $alat) {
+            fputcsv($handle, [
+                $alat->id,
+                $alat->kode_alat,
+                $alat->nama_alat,
+                $alat->kategori->nama_kategori ?? '-',
+                $alat->merk,
+                $alat->kondisi,
+                $alat->jumlah_total,
+                $alat->jumlah_tersedia,
+                $alat->jumlah_rusak
+            ]);
+        }
+
+        fseek($handle, 0);
+        return response()->stream(
+            function () use ($handle) {
+                fpassthru($handle);
+            },
+            200,
+            [
+                "Content-Type" => "text/csv",
+                "Content-Disposition" => "attachment; filename=\"$filename\"",
+            ]
+        );
+    }
+    public function showRepair(Alat $alat)
+    {
+        return view('admin.alat.repair', compact('alat'));
+    }
+
+    public function postRepair(Request $request, Alat $alat)
+    {
+        $request->validate([
+            'jumlah' => ['required', 'integer', 'min:1', 'max:' . $alat->jumlah_rusak],
+        ]);
+
+        $alat->decrement('jumlah_rusak', $request->jumlah);
+        $alat->increment('jumlah_tersedia', $request->jumlah);
+
+        // Update overall condition if necessary
+        if ($alat->jumlah_rusak == 0) {
+            $alat->update(['kondisi' => 'baik']);
+        }
+
+        \App\Models\LogAktivitas::catat(auth()->id(), 'REPAIR', 'alat', null, [
+            'nama_alat' => $alat->nama_alat,
+            'jumlah_diperbaiki' => $request->jumlah,
+            'sisa_rusak' => $alat->jumlah_rusak,
+            'stok_tersedia_baru' => $alat->jumlah_tersedia
+        ]);
+
+        return redirect()->route('admin.alat.index')->with('success', $request->jumlah . ' unit berhasil diperbaiki dan dikembalikan ke stok tersedia.');
     }
 }

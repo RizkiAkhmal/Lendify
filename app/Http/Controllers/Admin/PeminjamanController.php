@@ -10,19 +10,25 @@ class PeminjamanController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Peminjaman::with(['user', 'alat']);
+        $query = Peminjaman::with(['user', 'alat', 'pengembalian']);
 
         if ($request->has('status') && $request->status != '') {
             $query->where('status', $request->status);
         }
 
-        $peminjaman = $query->latest()->paginate(10);
+        $peminjaman = $query->oldest()->paginate(10);
         return view('admin.peminjaman.index', compact('peminjaman'));
     }
 
     public function show(Peminjaman $peminjaman)
     {
         return view('admin.peminjaman.show', compact('peminjaman'));
+    }
+
+    public function invoice(Peminjaman $peminjaman)
+    {
+        $peminjaman->load(['user', 'alat', 'pengembalian']);
+        return view('admin.peminjaman.invoice', compact('peminjaman'));
     }
 
     public function update(Request $request, Peminjaman $peminjaman)
@@ -54,5 +60,38 @@ class PeminjamanController extends Controller
     {
         $peminjaman->delete();
         return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman deleted successfully.');
+    }
+
+    public function export()
+    {
+        $peminjaman = Peminjaman::with(['user', 'alat'])->get();
+        $filename = "peminjaman-" . date('Y-m-d') . ".csv";
+        $handle = fopen('php://memory', 'w');
+        fputcsv($handle, ['ID', 'Peminjam', 'Alat', 'Jumlah', 'Tgl Pinjam', 'Tgl Kembali Rencana', 'Status', 'Keperluan']);
+
+        foreach ($peminjaman as $item) {
+            fputcsv($handle, [
+                $item->id,
+                $item->user->name ?? '-',
+                $item->alat->nama_alat ?? '-',
+                $item->jumlah,
+                $item->tanggal_pinjam,
+                $item->tanggal_kembali_rencana,
+                $item->status,
+                $item->keperluan
+            ]);
+        }
+
+        fseek($handle, 0);
+        return response()->stream(
+            function () use ($handle) {
+                fpassthru($handle);
+            },
+            200,
+            [
+                "Content-Type" => "text/csv",
+                "Content-Disposition" => "attachment; filename=\"$filename\"",
+            ]
+        );
     }
 }

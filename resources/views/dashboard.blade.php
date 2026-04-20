@@ -16,7 +16,7 @@
                         Selamat Datang, <span class="text-[#009ef7]">{{ Auth::user()->name }}</span>!
                     </h1>
                     <p class="text-sm text-gray-500 mt-1">
-                        Anda masuk sebagai <span class="font-semibold text-gray-700 capitalize">{{ Auth::user()->role }}</span>. Kelola peminjaman alat praktik dengan mudah.
+                        Kelola peminjaman alat praktik dengan mudah.
                     </p>
                 </div>
             </div>
@@ -27,8 +27,8 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                     </div>
                     <div>
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Alat</p>
-                        <p class="text-lg font-black text-gray-800">{{ number_format($stats['total_alat']) }}</p>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Pinjaman</p>
+                        <p class="text-lg font-black text-gray-800">{{ number_format($stats['total_pinjaman']) }}</p>
                     </div>
                 </div>
                 <div class="p-4 flex items-center gap-3 border-r border-gray-100">
@@ -108,143 +108,204 @@
         </div>
 
     @else
-        {{-- ========== DASHBOARD ADMIN & PETUGAS (ORIGINAL) ========== --}}
+        {{-- ========== DASHBOARD ADMIN & PETUGAS ========== --}}
 
-        <!-- Welcome Card -->
-        <div class="card-metronic overflow-hidden border-0 shadow-sm">
-            <div class="p-8 flex flex-col md:flex-row items-center justify-between bg-white relative overflow-hidden">
-                <div class="z-10 text-center md:text-left">
-                    <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 mb-2">
-                        Selamat Datang, <span class="text-[#009ef7]">{{ Auth::user()->name }}</span>!
-                    </h1>
-                    <p class="text-gray-500 max-w-lg">
-                        Anda masuk sebagai <span class="font-semibold text-gray-700 capitalize">{{ Auth::user()->role }}</span>. 
-                        Aplikasi ini dikembangkan untuk memudahkan manajemen peminjaman alat praktik secara efisien dan transparan.
-                    </p>
-                    <div class="mt-6 flex flex-wrap gap-3 justify-center md:justify-start">
-                        @if(Auth::user()->role === 'petugas')
-                            <a href="{{ route('petugas.approval.index') }}" class="px-6 py-2 bg-[#009ef7] text-white rounded-lg font-bold hover:bg-[#0086d1] transition shadow-sm">
-                                Cek Antrean Persetujuan
-                            </a>
-                        @else
-                            <a href="{{ route('admin.users.index') }}" class="px-6 py-2 bg-[#009ef7] text-white rounded-lg font-bold hover:bg-[#0086d1] transition shadow-sm">
-                                Kelola Pengguna
-                            </a>
-                        @endif
+        <!-- Page Heading -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
+                <p class="text-sm text-gray-500">Live monitoring data inventaris dan keuangan denda.</p>
+            </div>
+            <div class="mt-4 md:mt-0 flex items-center gap-3">
+                <div class="px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-100 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    {{ now()->translatedFormat('d F Y') }}
+                </div>
+                @if(Auth::user()->role === 'admin')
+                    <a href="{{ route('admin.alat.create') }}" class="px-5 py-2 bg-[#009ef7] text-white rounded-lg font-bold text-sm hover:bg-[#0086d1] transition shadow-sm">
+                        + Tambah Alat
+                    </a>
+                @endif
+            </div>
+        </div>
+
+        <!-- Quick Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="card-metronic p-6 bg-white border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-[#009ef7] flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Alat</p>
+                        <h3 class="text-xl font-black text-gray-800">{{ number_format($stats['total_alat']) }}</h3>
                     </div>
                 </div>
-                <div class="mt-8 md:mt-0 opacity-20 md:opacity-100 z-0 md:relative">
-                    <svg class="w-48 h-48 text-[#009ef7]" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2L2 7L12 12L22 7L12 2Z" />
-                        <path d="M2 17L12 22L22 17" opacity="0.3" />
-                        <path d="M2 12L12 17L22 12" opacity="0.5" />
-                    </svg>
+            </div>
+            <div class="card-metronic p-6 bg-white border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-yellow-50 text-yellow-500 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Pending</p>
+                        <h3 class="text-xl font-black text-gray-800">{{ number_format($stats['pending']) }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-metronic p-6 bg-white border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-green-50 text-green-500 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Selesai</p>
+                        <h3 class="text-xl font-black text-gray-800">{{ number_format($stats['selesai']) }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-metronic p-6 bg-white border border-gray-100 hover:shadow-md transition">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-red-50 text-red-500 flex items-center justify-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Alat Rusak</p>
+                        <h3 class="text-xl font-black text-gray-800">{{ number_format($stats['rusak']) }}</h3>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Stats -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="card-metronic p-6 flex items-center">
-                <div class="p-4 rounded-xl bg-blue-50 text-[#009ef7] mr-4">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        <!-- Finance Section -->
+        <div class="card-metronic bg-white overflow-hidden border border-gray-100 hover:shadow-lg transition duration-300">
+            <div class="p-8 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-inner">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total Pendapatan Denda</p>
+                        <h2 class="text-3xl font-black text-gray-900 leading-none">Rp {{ number_format($stats['total_denda'], 0, ',', '.') }}</h2>
+                        <div class="mt-2 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider italic">Akumulasi Real-time</span>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider">Total Alat</p>
-                    <h3 class="text-2xl font-black text-gray-800">{{ number_format($stats['total_alat']) }}</h3>
-                </div>
-            </div>
-            
-            <div class="card-metronic p-6 flex items-center">
-                <div class="p-4 rounded-xl bg-yellow-50 text-yellow-500 mr-4">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-                <div>
-                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider">Pending</p>
-                    <h3 class="text-2xl font-black text-gray-800">{{ number_format($stats['pending']) }}</h3>
-                </div>
-            </div>
-
-            <div class="card-metronic p-6 flex items-center">
-                <div class="p-4 rounded-xl bg-green-50 text-green-500 mr-4">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                </div>
-                <div>
-                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider">Selesai</p>
-                    <h3 class="text-2xl font-black text-gray-800">{{ number_format($stats['selesai']) }}</h3>
-                </div>
-            </div>
-
-            <div class="card-metronic p-6 flex items-center">
-                <div class="p-4 rounded-xl bg-red-50 text-red-500 mr-4">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                </div>
-                <div>
-                    <p class="text-sm font-bold text-gray-400 uppercase tracking-wider">Rusak</p>
-                    <h3 class="text-2xl font-black text-gray-800">{{ number_format($stats['rusak']) }}</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Latest Activity -->
-            <div class="card-metronic p-6">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-bold text-gray-800">Aktivitas Terakhir</h3>
+                <div class="w-full md:w-auto flex flex-col md:flex-row gap-3">
+                    <a href="{{ route('admin.peminjaman.index') }}" class="px-6 py-3 bg-gray-50 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-100 transition text-center">Riwayat Transaksi</a>
                     @if(Auth::user()->role === 'admin')
-                        <a href="{{ route('admin.log.index') }}" class="text-sm font-bold text-[#009ef7] hover:underline">Lihat Semua</a>
+                        <a href="{{ route('admin.alat.index') }}" class="px-6 py-3 bg-[#009ef7] text-white rounded-xl font-bold text-sm hover:bg-[#0086d1] transition shadow-md text-center">Manajemen Inventaris</a>
                     @endif
                 </div>
-                <div class="space-y-6">
-                    @forelse($latestActivities as $activity)
-                        <div class="flex items-start">
-                            <div class="w-2 h-2 rounded-full bg-[#009ef7] mt-2 mr-4"></div>
-                            <div class="flex-1">
-                                <p class="text-sm text-gray-800 font-semibold mb-1">
-                                    @if($activity instanceof \App\Models\LogAktivitas)
-                                        <span class="text-gray-900">{{ $activity->user->name }}</span> 
-                                        melakukan <span class="text-[#009ef7]">{{ $activity->aksi }}</span> 
-                                        pada tabel <span class="capitalize">{{ $activity->tabel }}</span>
-                                    @else
-                                        <span class="text-gray-900">{{ $activity->user->name }}</span> 
-                                        meminjam <span class="text-[#009ef7]">{{ $activity->alat->nama_alat }}</span>
-                                    @endif
-                                </p>
-                                <p class="text-xs text-gray-400">{{ $activity->created_at->diffForHumans() }}</p>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="text-center py-4 text-gray-400 text-sm italic">
-                            Belum ada aktivitas tercatat.
-                        </div>
-                    @endforelse
+            </div>
+            <div class="bg-gray-50/50 px-8 py-3 border-t border-gray-100">
+                <p class="text-[10px] text-gray-400 font-medium">Data diperbaharui otomatis setiap terjadi pengembalian alat dengan denda.</p>
+            </div>
+        </div>
+        <!-- Recent Data Sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+            <!-- Recent Loans -->
+            <div class="card-metronic bg-white border border-gray-100 flex flex-col">
+                <div class="p-6 border-b border-gray-50 flex items-center justify-between">
+                    <h3 class="font-bold text-gray-800">Peminjaman Terbaru</h3>
+                    <a href="{{ route(Auth::user()->role === 'admin' ? 'admin.peminjaman.index' : 'petugas.monitoring.index') }}" class="text-xs font-bold text-[#009ef7] hover:underline">Lihat Semua</a>
+                </div>
+                <div class="p-0 overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50/50 text-gray-400 uppercase text-[10px] font-bold">
+                            <tr>
+                                <th class="px-6 py-3">Peminjam</th>
+                                <th class="px-6 py-3">Alat</th>
+                                <th class="px-6 py-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @forelse($recentLoans as $loan)
+                                <tr class="hover:bg-gray-50/30 transition">
+                                    <td class="px-6 py-4">
+                                        <div class="flex flex-col">
+                                            <span class="font-bold text-gray-800">{{ $loan->user->name }}</span>
+                                            <span class="text-[10px] text-gray-400">{{ $loan->created_at->diffForHumans() }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-gray-600 font-medium">
+                                        {{ $loan->alat->nama_alat }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        @php
+                                            $statusClasses = [
+                                                'pending' => 'bg-yellow-50 text-yellow-600',
+                                                'dipinjam' => 'bg-blue-50 text-blue-600',
+                                                'kembali' => 'bg-indigo-50 text-indigo-600',
+                                                'selesai' => 'bg-green-50 text-green-600',
+                                                'ditolak' => 'bg-red-50 text-red-600',
+                                            ];
+                                        @endphp
+                                        <span class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase {{ $statusClasses[$loan->status] ?? 'bg-gray-50 text-gray-600' }}">
+                                            {{ $loan->status }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="px-6 py-10 text-center text-gray-400 italic">Belum ada aktivitas peminjaman.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- Resource Center -->
-            <div class="card-metronic p-6">
-                <div class="flex items-center justify-between mb-6">
-                    <h3 class="text-lg font-bold text-gray-800">Panduan Penggunaan</h3>
+            <!-- Recent Tools -->
+            <div class="card-metronic bg-white border border-gray-100 flex flex-col">
+                <div class="p-6 border-b border-gray-50 flex items-center justify-between">
+                    <h3 class="font-bold text-gray-800">Stok Alat Terbaru</h3>
+                    <a href="{{ route(Auth::user()->role === 'admin' ? 'admin.alat.index' : 'petugas.katalog') }}" class="text-xs font-bold text-[#009ef7] hover:underline">Lihat Semua</a>
                 </div>
-                <div class="space-y-4">
-                    <div class="p-4 rounded-xl border border-dashed border-gray-300 flex items-center hover:bg-gray-50 cursor-pointer transition">
-                        <div class="p-3 rounded-lg bg-orange-50 text-orange-500 mr-4">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                        </div>
-                        <div>
-                            <p class="font-bold text-gray-800">Prosedur Peminjaman</p>
-                            <p class="text-xs text-gray-500">Pelajari langkah demi langkah meminjam alat.</p>
-                        </div>
-                    </div>
-                    <div class="p-4 rounded-xl border border-dashed border-gray-300 flex items-center hover:bg-gray-50 cursor-pointer transition">
-                        <div class="p-3 rounded-lg bg-purple-50 text-purple-500 mr-4">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <div>
-                            <p class="font-bold text-gray-800">Kebijakan Denda</p>
-                            <p class="text-xs text-gray-500">Informasi tentang denda keterlambatan dan kerusakan.</p>
-                        </div>
-                    </div>
+                <div class="p-0 overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-gray-50/50 text-gray-400 uppercase text-[10px] font-bold">
+                            <tr>
+                                <th class="px-6 py-3">Nama Alat</th>
+                                <th class="px-6 py-3">Kategori</th>
+                                <th class="px-6 py-3">Tersedia</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            @forelse($recentAlats as $alat)
+                                <tr class="hover:bg-gray-50/30 transition">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded bg-gray-50 flex items-center justify-center text-gray-400 overflow-hidden">
+                                                @if($alat->foto)
+                                                    <img src="{{ Storage::url($alat->foto) }}" class="w-full h-full object-cover">
+                                                @else
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                                @endif
+                                            </div>
+                                            <span class="font-bold text-gray-800 truncate max-w-[120px]">{{ $alat->nama_alat }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md font-medium">
+                                            {{ $alat->kategori->nama_kategori ?? '-' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-black text-gray-800">{{ $alat->jumlah_tersedia }}</span>
+                                            <span class="text-[10px] text-gray-400">/ {{ $alat->jumlah_total }}</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="px-6 py-10 text-center text-gray-400 italic">Data alat belum tersedia.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

@@ -20,12 +20,14 @@ class Alat extends Model
         'kondisi',
         'jumlah_total',
         'jumlah_tersedia',
+        'jumlah_rusak',
         'foto',
     ];
 
     protected $casts = [
         'jumlah_total' => 'integer',
         'jumlah_tersedia' => 'integer',
+        'jumlah_rusak' => 'integer',
     ];
 
     /**

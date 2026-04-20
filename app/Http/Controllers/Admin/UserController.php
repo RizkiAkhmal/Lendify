@@ -29,7 +29,7 @@ class UserController extends Controller
             $query->where('role', $request->role);
         }
 
-        $users = $query->latest()->paginate(10)->withQueryString();
+        $users = $query->oldest()->paginate(10)->withQueryString();
         return view('admin.users.index', compact('users'));
     }
 
@@ -103,5 +103,38 @@ class UserController extends Controller
         $user->delete();
         \App\Models\LogAktivitas::catat(auth()->id(), 'DELETE', 'users', $oldData, null);
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+    }
+
+    public function export()
+    {
+        $users = User::all();
+        $filename = "users-" . date('Y-m-d') . ".csv";
+        $handle = fopen('php://memory', 'w');
+        fputcsv($handle, ['ID', 'Name', 'Email', 'Role', 'Status', 'Phone', 'Address', 'Created At']);
+
+        foreach ($users as $user) {
+            fputcsv($handle, [
+                $user->id,
+                $user->name,
+                $user->email,
+                $user->role,
+                $user->status,
+                $user->phone,
+                $user->address,
+                $user->created_at
+            ]);
+        }
+
+        fseek($handle, 0);
+        return response()->stream(
+            function () use ($handle) {
+                fpassthru($handle);
+            },
+            200,
+            [
+                "Content-Type" => "text/csv",
+                "Content-Disposition" => "attachment; filename=\"$filename\"",
+            ]
+        );
     }
 }

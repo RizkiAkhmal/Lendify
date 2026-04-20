@@ -66,15 +66,23 @@
                         <!-- Jumlah Total -->
                         <div class="mt-4">
                             <x-input-label for="jumlah_total" :value="__('Jumlah Total')" />
-                            <x-text-input id="jumlah_total" class="block mt-1 w-full" type="number" name="jumlah_total" :value="old('jumlah_total', $alat->jumlah_total)" required min="1" />
-                            <p class="text-xs text-gray-500 mt-1">Changing total affects available stock.</p>
+                            <x-text-input id="jumlah_total" class="block mt-1 w-full" type="number" name="jumlah_total" :value="old('jumlah_total', $alat->jumlah_total)" required min="0" />
+                            <p class="text-xs text-gray-500 mt-1">Mengubah total akan menyesuaikan stok tersedia secara otomatis.</p>
                             <x-input-error :messages="$errors->get('jumlah_total')" class="mt-2" />
+                        </div>
+
+                        <!-- Jumlah Rusak -->
+                        <div class="mt-4">
+                            <x-input-label for="jumlah_rusak" :value="__('Jumlah Unit Rusak')" />
+                            <x-text-input id="jumlah_rusak" class="block mt-1 w-full" type="number" name="jumlah_rusak" :value="old('jumlah_rusak', $alat->jumlah_rusak)" required min="0" />
+                            <p class="text-xs text-gray-400 mt-1 italic">Unit yang sedang dalam masa perbaikan (tidak dapat dipinjam).</p>
+                            <x-input-error :messages="$errors->get('jumlah_rusak')" class="mt-2" />
                         </div>
                         
                         <!-- Current Available (Read-only for info) -->
                         <div class="mt-4">
-                            <x-input-label for="jumlah_tersedia" :value="__('Jumlah Tersedia (Calculated)')" />
-                            <x-text-input id="jumlah_tersedia" class="block mt-1 w-full bg-gray-100" type="number" :value="$alat->jumlah_tersedia" disabled />
+                            <x-input-label for="jumlah_tersedia" :value="__('Stok Tersedia Saat Ini (Info)')" />
+                            <x-text-input id="jumlah_tersedia" class="block mt-1 w-full bg-gray-50 border-gray-200 text-gray-500" type="number" :value="$alat->jumlah_tersedia" disabled />
                         </div>
 
                         <!-- Foto -->

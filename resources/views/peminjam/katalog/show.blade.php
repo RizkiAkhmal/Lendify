@@ -94,7 +94,7 @@
                                         <!-- Keperluan -->
                                         <div class="mt-4">
                                             <x-input-label for="keperluan" :value="__('Keperluan Peminjaman')" />
-                                            <textarea id="keperluan" name="keperluan" rows="3" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" required placeholder="Contoh: Untuk praktikum fisika dasar">{{ old('keperluan') }}</textarea>
+                                            <textarea id="keperluan" name="keperluan" rows="3" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500" required placeholder="Isi keperluan peminjaman alat.">{{ old('keperluan') }}</textarea>
                                             <x-input-error :messages="$errors->get('keperluan')" class="mt-2" />
                                         </div>
 
