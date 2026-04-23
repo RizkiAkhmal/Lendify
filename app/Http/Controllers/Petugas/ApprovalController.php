@@ -48,7 +48,7 @@ class ApprovalController extends Controller
             \App\Models\LogAktivitas::catat(Auth::id(), 'APPROVE', 'peminjaman', null, $peminjaman->toArray());
         });
 
-        return back()->with('success', 'Peminjaman disetujui. Stok alat telah dikurangi.');
+        return back()->with('success', 'Peminjaman disetujui.');
     }
 
     public function pickup(Peminjaman $peminjaman)
@@ -60,12 +60,12 @@ class ApprovalController extends Controller
         // Update status to 'dipinjam' and record actual pickup time
         $peminjaman->update([
             'status' => 'dipinjam',
-            'tanggal_peminjaman' => now(), // Set to actual pickup time
+            'tanggal_pinjam' => now(), // Set to actual pickup time
         ]);
 
         \App\Models\LogAktivitas::catat(Auth::id(), 'PICKUP', 'peminjaman', null, $peminjaman->toArray());
 
-        return back()->with('success', 'Barang berhasil diambil (Status: Dipinjam). Monitoring sekarang fokus pada pengembalian.');
+        return back()->with('success', 'Barang berhasil diambil');
     }
 
     public function reject(Request $request, Peminjaman $peminjaman)

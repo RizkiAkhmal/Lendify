@@ -43,9 +43,9 @@
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex justify-center space-x-2">
                                         @if($item->alat->jumlah_tersedia >= $item->jumlah)
-                                            <form action="{{ route('petugas.approval.approve', $item) }}" method="POST">
+                                            <form id="approve-form-{{ $item->id }}" action="{{ route('petugas.approval.approve', $item) }}" method="POST">
                                                 @csrf
-                                                <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded text-[10px] font-bold uppercase hover:bg-green-600" onclick="return confirm('Setujui peminjaman ini?')">
+                                                <button type="button" onclick="confirmSubmit('approve-form-{{ $item->id }}', 'Setujui Peminjaman?', 'Stok alat akan otomatis berkurang setelah disetujui.')" class="bg-green-500 text-white px-3 py-1 rounded text-[10px] font-bold uppercase hover:bg-green-600 transition">
                                                     SETUJUI
                                                 </button>
                                             </form>
@@ -55,18 +55,13 @@
                                             </button>
                                         @endif
 
-                                        <div x-data="{ open: false }" class="relative">
-                                            <button @click="open = !open" class="bg-red-500 text-white px-3 py-1 rounded text-[10px] font-bold uppercase hover:bg-red-600">
-                                                TOLAK
-                                            </button>
-                                            <div x-show="open" @click.away="open = false" class="absolute right-0 bottom-full mb-2 w-64 bg-white p-3 rounded-lg shadow-xl border border-gray-100 z-50">
-                                                <form action="{{ route('petugas.approval.reject', $item) }}" method="POST">
-                                                    @csrf
-                                                    <textarea name="catatan_petugas" class="w-full text-xs p-2 border rounded mb-2" placeholder="Alasan penolakan..." required></textarea>
-                                                    <button type="submit" class="w-full py-1.5 bg-red-500 text-white rounded text-[10px] font-bold uppercase">Konfirmasi</button>
-                                                </form>
-                                            </div>
-                                        </div>
+                                        <form id="reject-form-{{ $item->id }}" action="{{ route('petugas.approval.reject', $item) }}" method="POST" class="hidden">
+                                            @csrf
+                                            <input type="hidden" name="catatan_petugas" id="catatan-{{ $item->id }}">
+                                        </form>
+                                        <button type="button" onclick="promptReject({{ $item->id }})" class="bg-red-50 text-red-600 px-3 py-1 rounded text-[10px] font-bold uppercase hover:bg-red-500 hover:text-white transition border border-red-200">
+                                            TOLAK
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -108,9 +103,9 @@
                                     <div class="text-sm font-bold text-gray-800">{{ $item->alat->nama_alat }} ({{ $item->jumlah }})</div>
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    <form action="{{ route('petugas.approval.pickup', $item) }}" method="POST">
+                                    <form id="pickup-form-{{ $item->id }}" action="{{ route('petugas.approval.pickup', $item) }}" method="POST">
                                         @csrf
-                                        <button type="submit" class="bg-[#009ef7] text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase hover:bg-blue-600 shadow-sm" onclick="return confirm('Konfirmasi pengambilan barang?')">
+                                        <button type="button" onclick="confirmSubmit('pickup-form-{{ $item->id }}', 'Konfirmasi Pengambilan?', 'apakah anda yakin?')" class="bg-[#009ef7] text-white px-4 py-1.5 rounded text-[10px] font-bold uppercase hover:bg-blue-600 shadow-sm transition">
                                             Barang Diambil
                                         </button>
                                     </form>
@@ -127,4 +122,39 @@
         </div>
     </div>
     </div>
+    <script>
+        function promptReject(id) {
+            Swal.fire({
+                title: 'Alasan Penolakan',
+                input: 'textarea',
+                inputPlaceholder: 'TAlasan penolakan',
+                inputAttributes: {
+                    'aria-label': 'Alasan penolakan'
+                },
+                showCancelButton: true,
+                confirmButtonColor: '#f1416c',
+                cancelButtonColor: '#f1f1f1',
+                confirmButtonText: 'Tolak Sekarang',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                customClass: {
+                    title: 'text-lg font-bold text-gray-800',
+                    input: 'text-sm rounded-lg border-gray-200 focus:ring-[#f1416c] focus:border-[#f1416c]',
+                    confirmButton: 'px-6 py-2 rounded-md font-semibold text-white text-xs uppercase tracking-wider',
+                    cancelButton: 'px-6 py-2 rounded-md font-semibold text-gray-600 text-xs uppercase tracking-wider'
+                },
+                preConfirm: (value) => {
+                    if (!value) {
+                        Swal.showValidationMessage('Alasan penolakan wajib diisi!')
+                    }
+                    return value;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('catatan-' + id).value = result.value;
+                    document.getElementById('reject-form-' + id).submit();
+                }
+            });
+        }
+    </script>
 </x-app-layout>

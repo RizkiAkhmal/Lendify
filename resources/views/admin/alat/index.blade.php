@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        Data Alat Praktik
+        Data Alat 
     </x-slot>
 
     <div class="card-metronic overflow-hidden">
@@ -17,7 +17,7 @@
             <div class="flex items-center space-x-2 w-full sm:w-auto">
                 <a href="{{ route('admin.alat.export') }}" class="flex-1 sm:flex-none px-6 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition shadow-sm flex items-center justify-center">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    Export CSV
+                    Export
                 </a>
                 <a href="{{ route('admin.alat.create') }}" class="flex-1 sm:flex-none px-6 py-2 bg-[#009ef7] text-white rounded-lg font-bold hover:bg-[#0086d1] transition shadow-sm flex items-center justify-center">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
@@ -34,7 +34,6 @@
                         <th class="px-6 py-4">Informasi Alat</th>
                         <th class="px-6 py-4">Kategori</th>
                         <th class="px-6 py-4">Stok</th>
-                        <th class="px-6 py-4">Kondisi</th>
                         <th class="px-6 py-4 text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -89,19 +88,7 @@
                                     <span class="text-[9px] text-gray-400 mt-1">Total: {{ $alat->jumlah_total }} Unit</span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
-                                @php
-                                    $condColors = [
-                                        'baik' => 'bg-green-50 text-green-600',
-                                        'rusak_ringan' => 'bg-yellow-50 text-yellow-600',
-                                        'rusak_berat' => 'bg-red-50 text-red-600',
-                                    ];
-                                    $condColor = $condColors[$alat->kondisi] ?? 'bg-gray-50 text-gray-600';
-                                @endphp
-                                <span class="px-3 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider {{ $condColor }}">
-                                    {{ str_replace('_', ' ', $alat->kondisi) }}
-                                </span>
-                            </td>
+
                             <td class="px-6 py-4">
                                 <div class="flex justify-center items-center space-x-2">
                                     @if($alat->jumlah_rusak > 0)
@@ -115,9 +102,9 @@
                                     <a href="{{ route('admin.alat.edit', $alat) }}" class="p-2 rounded-lg bg-gray-50 text-gray-400 hover:text-[#009ef7] hover:bg-blue-50 transition">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                     </a>
-                                    <form action="{{ route('admin.alat.destroy', $alat) }}" method="POST" class="inline" onsubmit="return confirm('Hapus alat ini?')">
+                                    <form id="delete-form-{{ $alat->id }}" action="{{ route('admin.alat.destroy', $alat) }}" method="POST" class="inline">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="p-2 rounded-lg bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 transition">
+                                        <button type="button" onclick="confirmDelete('{{ $alat->id }}', 'Alat {{ $alat->nama_alat }} akan dihapus.')" class="p-2 rounded-lg bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 transition">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                         </button>
                                     </form>

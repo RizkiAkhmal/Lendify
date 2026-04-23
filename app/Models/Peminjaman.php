@@ -18,6 +18,7 @@ class Peminjaman extends Model
         'petugas_id',
         'tanggal_pengajuan',
         'tanggal_peminjaman',
+        'tanggal_pinjam',
         'tanggal_kembali_rencana',
         'jumlah',
         'keperluan',
@@ -28,6 +29,7 @@ class Peminjaman extends Model
     protected $casts = [
         'tanggal_pengajuan' => 'date',
         'tanggal_peminjaman' => 'date',
+        'tanggal_pinjam' => 'datetime',
         'tanggal_kembali_rencana' => 'date',
         'jumlah' => 'integer',
     ];

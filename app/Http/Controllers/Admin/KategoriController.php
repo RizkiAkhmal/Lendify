@@ -35,7 +35,7 @@ class KategoriController extends Controller
 
         Kategori::create($request->all());
 
-        return redirect()->route('admin.kategori.index')->with('success', 'Kategori created successfully.');
+        return redirect()->route('admin.kategori.index')->with('success', 'Kategori berhasil ditambahkan.');
     }
 
     public function edit(Kategori $kategori)
@@ -52,16 +52,16 @@ class KategoriController extends Controller
 
         $kategori->update($request->all());
 
-        return redirect()->route('admin.kategori.index')->with('success', 'Kategori updated successfully.');
+        return redirect()->route('admin.kategori.index')->with('success', 'Kategori berhasil diperbarui.');
     }
 
     public function destroy(Kategori $kategori)
     {
         if ($kategori->alat()->count() > 0) {
-            return back()->with('error', 'Cannot delete kategori because it has associated alat items.');
+            return back()->with('error', 'Kategori tidak dapat dihapus karena masih memiliki alat.');
         }
 
         $kategori->delete();
-        return redirect()->route('admin.kategori.index')->with('success', 'Kategori deleted successfully.');
+        return redirect()->route('admin.kategori.index')->with('success', 'Kategori berhasil dihapus.');
     }
 }

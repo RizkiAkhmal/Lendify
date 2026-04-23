@@ -59,21 +59,7 @@
                                 </div>
                             </div>
 
-                            <div class="mb-8">
-                                <h4 class="text-sm font-bold text-gray-800 uppercase tracking-wider mb-3 border-b pb-2">Kondisi Saat Ini</h4>
-                                <div class="flex items-center gap-3">
-                                    @php
-                                        $kondisiColors = [
-                                            'baik' => 'bg-green-500',
-                                            'rusak_ringan' => 'bg-yellow-500',
-                                            'rusak_berat' => 'bg-red-500',
-                                        ];
-                                        $color = $kondisiColors[$alat->kondisi] ?? 'bg-gray-500';
-                                    @endphp
-                                    <div class="w-3 h-3 rounded-full {{ $color }}"></div>
-                                    <span class="text-sm font-bold text-gray-700 uppercase">{{ str_replace('_', ' ', $alat->kondisi) }}</span>
-                                </div>
-                            </div>
+
 
                             <div class="p-4 bg-blue-50 border border-blue-100 rounded-lg">
                                 <div class="flex">

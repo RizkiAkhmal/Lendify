@@ -63,6 +63,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['role:peminjam'])->prefix('peminjam')->name('peminjam.')->group(function () {
         Route::get('katalog', [Peminjam\KatalogController::class, 'index'])->name('katalog.index');
         Route::get('katalog/{alat}', [Peminjam\KatalogController::class, 'show'])->name('katalog.show');
+        
+        // Cart Routes
+        Route::get('cart', [Peminjam\CartController::class, 'index'])->name('cart.index');
+        Route::get('cart/checkout', function() { return redirect()->route('peminjam.cart.index'); });
+        Route::post('cart/checkout', [Peminjam\CartController::class, 'checkout'])->name('cart.checkout');
+        Route::post('cart/{alat}', [Peminjam\CartController::class, 'add'])->name('cart.add');
+        Route::patch('cart/{id}', [Peminjam\CartController::class, 'update'])->name('cart.update');
+        Route::delete('cart/{id}', [Peminjam\CartController::class, 'remove'])->name('cart.remove');
+
         Route::get('peminjaman', [Peminjam\PeminjamanController::class, 'index'])->name('peminjaman.index');
         Route::post('peminjaman', [Peminjam\PeminjamanController::class, 'store'])->name('peminjaman.store');
         Route::get('pengembalian/{peminjaman}', [Peminjam\PengembalianController::class, 'show'])->name('pengembalian.show');

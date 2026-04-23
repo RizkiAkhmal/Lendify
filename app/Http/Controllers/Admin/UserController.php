@@ -45,7 +45,7 @@ class UserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
             'role' => ['required', 'in:admin,petugas,peminjam'],
-            'phone' => ['nullable', 'string', 'max:15'],
+            'phone' => ['required', 'numeric', 'min_digits:10'],
             'address' => ['nullable', 'string', 'max:255'],
         ]);
 
@@ -63,7 +63,7 @@ class UserController extends Controller
 
         \App\Models\LogAktivitas::catat(auth()->id(), 'CREATE', 'users', null, $user->toArray());
 
-        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+        return redirect()->route('admin.users.index')->with('success', 'User berhasil ditambahkan.');
     }
 
     public function edit(User $user)
@@ -77,7 +77,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'role' => ['required', 'in:admin,petugas,peminjam'],
-            'phone' => ['nullable', 'string', 'max:15'],
+            'phone' => ['required', 'numeric', 'min_digits:10'],
             'address' => ['nullable', 'string', 'max:255'],
         ]);
 
@@ -94,15 +94,25 @@ class UserController extends Controller
 
         \App\Models\LogAktivitas::catat(auth()->id(), 'UPDATE', 'users', null, $user->toArray());
 
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+        return redirect()->route('admin.users.index')->with('success', 'User berhasil diperbarui.');
     }
 
     public function destroy(User $user)
     {
+        // 1. Prevent deleting self
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri yang sedang aktif.');
+        }
+
+        // 2. Check if user has transaction history (Loans)
+        if ($user->peminjaman()->exists() || $user->peminjamanDisetujui()->exists()) {
+            return back()->with('error', 'Pengguna tidak dapat dihapus karena memiliki riwayat transaksi (peminjaman) di dalam sistem.');
+        }
+
         $oldData = $user->toArray();
         $user->delete();
         \App\Models\LogAktivitas::catat(auth()->id(), 'DELETE', 'users', $oldData, null);
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus.');
     }
 
     public function export()

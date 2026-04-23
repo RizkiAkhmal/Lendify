@@ -14,6 +14,9 @@ class PeminjamanController extends Controller
 
         if ($request->has('status') && $request->status != '') {
             $query->where('status', $request->status);
+        } else {
+            // By default, only show active/pending loans. Finished ones go to Pengembalian menu.
+            $query->where('status', '!=', 'selesai');
         }
 
         $peminjaman = $query->oldest()->paginate(10);
@@ -53,13 +56,13 @@ class PeminjamanController extends Controller
         
         $peminjaman->update(['status' => $request->status]);
 
-        return back()->with('success', 'Status updated successfully.');
+        return back()->with('success', 'Status Berhasil Diperbarui.');
     }
 
     public function destroy(Peminjaman $peminjaman)
     {
         $peminjaman->delete();
-        return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman deleted successfully.');
+        return redirect()->route('admin.peminjaman.index')->with('success', 'Peminjaman berhasil dihapus.');
     }
 
     public function export()
@@ -72,12 +75,12 @@ class PeminjamanController extends Controller
         foreach ($peminjaman as $item) {
             fputcsv($handle, [
                 $item->id,
-                $item->user->name ?? '-',
-                $item->alat->nama_alat ?? '-',
+                strtoupper($item->user->name ?? '-'),
+                strtoupper($item->alat->nama_alat ?? '-'),
                 $item->jumlah,
-                $item->tanggal_pinjam,
-                $item->tanggal_kembali_rencana,
-                $item->status,
+                $item->tanggal_pinjam ? $item->tanggal_pinjam->format('d/m/Y H:i') : '-',
+                $item->tanggal_kembali_rencana ? $item->tanggal_kembali_rencana->format('d/m/Y') : '-',
+                strtoupper($item->status),
                 $item->keperluan
             ]);
         }

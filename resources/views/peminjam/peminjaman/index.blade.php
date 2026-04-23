@@ -21,7 +21,7 @@
                         <th class="px-6 py-4">Informasi Alat</th>
                         <th class="px-6 py-4">Waktu Peminjaman</th>
                         <th class="px-6 py-4">Status</th>
-                        <th class="px-6 py-4">Catatan/Keperluan</th>
+                        <th class="px-6 py-4">Keperluan</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 bg-white">
@@ -61,7 +61,7 @@
                                     {{ $item->status }}
                                 </span>
 
-                                @if($item->status === 'selesai' && $item->pengembalian)
+                                @if($item->status === 'selesai' && $item->pengembalian && ($item->pengembalian->denda > 0 || $item->pengembalian->kondisi_alat !== 'baik'))
                                     <div class="mt-3 space-y-1 bg-gray-50 p-2 rounded-lg border border-gray-100 shadow-sm">
                                         @if($item->pengembalian->kondisi_alat !== 'baik')
                                             <div class="flex justify-between items-center text-[9px]">

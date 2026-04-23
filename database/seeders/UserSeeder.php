@@ -44,15 +44,6 @@ class UserSeeder extends Seeder
             'status' => 'active',
         ]);
 
-        // Peminjam 2
-        User::create([
-            'name' => 'Siti Aminah',
-            'email' => 'siti@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'peminjam',
-            'phone' => '081234567893',
-            'address' => 'Jl. Peminjam No. 4, Jakarta',
-            'status' => 'active',
-        ]);
+       
     }
 }

@@ -37,10 +37,7 @@
                                     <p class="text-gray-600 text-sm">Merk</p>
                                     <p class="font-semibold">{{ $alat->merk ?? '-' }}</p>
                                 </div>
-                                <div>
-                                    <p class="text-gray-600 text-sm">Kondisi</p>
-                                    <p class="font-semibold capitalize">{{ str_replace('_', ' ', $alat->kondisi) }}</p>
-                                </div>
+
                                 <div>
                                     <p class="text-gray-600 text-sm">Jumlah Total</p>
                                     <p class="font-semibold">{{ $alat->jumlah_total }}</p>

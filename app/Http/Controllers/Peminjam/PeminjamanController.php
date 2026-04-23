@@ -36,10 +36,18 @@ class PeminjamanController extends Controller
             return back()->withErrors(['jumlah' => 'Jumlah permintaan melebihi stok tersedia.']);
         }
 
+        $active_rentals = Peminjaman::where('user_id', Auth::id())
+            ->whereIn('status', ['pending', 'approved', 'dipinjam'])
+            ->sum('jumlah');
+
+        if (($active_rentals + $request->jumlah) > 3) {
+            return back()->withErrors(['jumlah' => 'Maksimal peminjaman adalah 3 barang secara total. Anda sedang meminjam ' . $active_rentals . ' barang.']);
+        }
+
         $peminjaman = Peminjaman::create([
             'user_id' => Auth::id(),
             'alat_id' => $request->alat_id,
-            'tanggal_pengajuan' => now(),
+            'tanggal_pengajuan' => now()->toDateString(),
             'tanggal_peminjaman' => $request->tanggal_peminjaman,
             'tanggal_kembali_rencana' => $request->tanggal_kembali_rencana,
             'jumlah' => $request->jumlah,

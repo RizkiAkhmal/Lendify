@@ -26,10 +26,7 @@ class KategoriSeeder extends Seeder
                 'nama_kategori' => 'Olahraga',
                 'deskripsi' => 'Peralatan olahraga'
             ],
-            [
-                'nama_kategori' => 'Multimedia',
-                'deskripsi' => 'Peralatan multimedia dan audio visual'
-            ],
+
         ];
 
         foreach ($kategoris as $kategori) {

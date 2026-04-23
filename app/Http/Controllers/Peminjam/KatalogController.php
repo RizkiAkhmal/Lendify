@@ -11,7 +11,7 @@ class KatalogController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Alat::with('kategori')->where('kondisi', '!=', 'rusak_berat');
+        $query = Alat::with('kategori');
 
         if ($request->has('kategori') && $request->kategori != '') {
             $query->where('kategori_id', $request->kategori);

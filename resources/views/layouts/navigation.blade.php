@@ -29,15 +29,18 @@
                         <x-nav-link :href="route('admin.peminjaman.index')" :active="request()->routeIs('admin.peminjaman.*')">
                             {{ __('Peminjaman') }}
                         </x-nav-link>
-                        {{-- <x-nav-link :href="route('admin.pengembalian.index')" :active="request()->routeIs('admin.pengembalian.*')">
+                        <x-nav-link :href="route('admin.pengembalian.index')" :active="request()->routeIs('admin.pengembalian.*')">
                             {{ __('Pengembalian') }}
-                        </x-nav-link> --}}
+                        </x-nav-link>
                          <x-nav-link :href="route('admin.log.index')" :active="request()->routeIs('admin.log.*')">
                             {{ __('Log') }}
                         </x-nav-link>
                     @endif
 
-                    @if(Auth::user()->role === 'petugas')
+                     @if(Auth::user()->role === 'petugas')
+                        <x-nav-link :href="route('petugas.katalog.index')" :active="request()->routeIs('petugas.katalog.*')">
+                            {{ __('Katalog') }}
+                        </x-nav-link>
                         <x-nav-link :href="route('petugas.approval.index')" :active="request()->routeIs('petugas.approval.*')">
                             {{ __('Approval') }}
                         </x-nav-link>
@@ -60,8 +63,25 @@
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
+            <!-- Right side elements -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
+                @if(Auth::user()->role === 'peminjam')
+                    <a href="{{ route('peminjam.cart.index') }}" class="relative inline-flex items-center p-2 mr-4 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        @php 
+                            $cartCount = 0;
+                            if(session()->has('cart')) {
+                                foreach(session('cart') as $item) $cartCount += $item['jumlah'];
+                            }
+                        @endphp
+                        @if($cartCount > 0)
+                        <span class="cart-badge absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-[10px] font-bold leading-none text-white transform translate-x-0 -translate-y-0 bg-red-600 border-2 border-white rounded-full">{{ $cartCount }}</span>
+                    @else
+                        <span class="cart-badge hidden absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-[10px] font-bold leading-none text-white transform translate-x-0 -translate-y-0 bg-red-600 border-2 border-white rounded-full">0</span>
+                        @endif
+                    </a>
+                @endif
+
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -126,6 +146,9 @@
             @endif
 
             @if(Auth::user()->role === 'petugas')
+                <x-responsive-nav-link :href="route('petugas.katalog.index')" :active="request()->routeIs('petugas.katalog.*')">
+                    {{ __('Katalog') }}
+                </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('petugas.approval.index')" :active="request()->routeIs('petugas.approval.*')">
                     {{ __('Approval') }}
                 </x-responsive-nav-link>
@@ -140,6 +163,20 @@
             @if(Auth::user()->role === 'peminjam')
                 <x-responsive-nav-link :href="route('peminjam.katalog.index')" :active="request()->routeIs('peminjam.katalog.*')">
                     {{ __('Katalog') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('peminjam.cart.index')" :active="request()->routeIs('peminjam.cart.*')">
+                    {{ __('Keranjang') }}
+                    @php 
+                        $cartCountResp = 0;
+                        if(session()->has('cart')) {
+                            foreach(session('cart') as $item) $cartCountResp += $item['jumlah'];
+                        }
+                    @endphp
+                    @if($cartCountResp > 0)
+                        <span class="cart-badge ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">{{ $cartCountResp }}</span>
+                    @else
+                        <span class="cart-badge hidden ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">0</span>
+                    @endif
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('peminjam.peminjaman.index')" :active="request()->routeIs('peminjam.peminjaman.*')">
                     {{ __('Riwayat') }}

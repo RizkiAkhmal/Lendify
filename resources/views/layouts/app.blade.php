@@ -54,6 +54,60 @@
             .btn-primary-metronic:hover {
                 background-color: #0086d1 !important;
             }
+            /* Sleek Alerts */
+            .alert-metronic {
+                padding: 1rem 1.5rem;
+                border-radius: 0.75rem;
+                margin-bottom: 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                font-weight: 500;
+                font-size: 0.875rem;
+                animation: slideDown 0.3s ease-out;
+            }
+            .alert-metronic-success {
+                background-color: #e8fff3;
+                color: #50cd89;
+                border: 1px solid #c1f0d5;
+            }
+            .alert-metronic-danger {
+                background-color: #fff5f8;
+                color: #f1416c;
+                border: 1px solid #ffd3d0;
+            }
+            
+            /* Validation Styles */
+            .input-error-metronic {
+                border-color: #f1416c !important;
+                background-color: #fff5f8 !important;
+                animation: shake 0.4s ease-in-out;
+            }
+            .error-text-metronic {
+                color: #f1416c;
+                font-size: 0.75rem;
+                font-weight: 500;
+                margin-top: 0.25rem;
+                display: flex;
+                align-items: center;
+            }
+            .error-text-metronic::before {
+                content: '•';
+                margin-right: 4px;
+                font-weight: bold;
+            }
+
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                50% { transform: translateX(5px); }
+                75% { transform: translateX(-5px); }
+            }
+
+            @keyframes slideDown {
+                from { transform: translateY(-10px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
         </style>
     </head>
     <body class="antialiased overflow-hidden">
@@ -125,9 +179,77 @@
 
                 <!-- Page Content -->
                 <main class="flex-1 overflow-x-hidden overflow-y-auto bg-[#f5f8fa] p-6">
+                    <!-- Session Alerts -->
+                    @if(session('success'))
+                        <div class="alert-metronic alert-metronic-success" id="alert-success">
+                            <svg class="w-5 h-5 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>{{ session('success') }}</span>
+                            <button onclick="document.getElementById('alert-success').remove()" class="ml-auto opacity-50 hover:opacity-100">&times;</button>
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="alert-metronic alert-metronic-danger" id="alert-error">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>{{ session('error') }}</span>
+                            <button onclick="document.getElementById('alert-error').remove()" class="ml-auto opacity-50 hover:opacity-100">&times;</button>
+                        </div>
+                    @endif
+
                     {{ $slot }}
                 </main>
             </div>
         </div>
     </body>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(id, message = 'Hapus data ini secara permanen?') {
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: message,
+                showCancelButton: true,
+                confirmButtonColor: '#1e1e2d',
+                cancelButtonColor: '#f1f1f1',
+                confirmButtonText: 'Hapus',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                customClass: {
+                    title: 'text-lg font-bold text-gray-800',
+                    htmlContainer: 'text-sm text-gray-500',
+                    confirmButton: 'px-5 py-2 rounded-md font-semibold text-white text-xs uppercase tracking-wider',
+                    cancelButton: 'px-5 py-2 rounded-md font-semibold text-gray-600 text-xs uppercase tracking-wider'
+                },
+                buttonsStyling: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            });
+        }
+
+        function confirmSubmit(formId, title = 'Konfirmasi Pengajuan', message = 'Apakah Anda yakin data yang diisi sudah benar?') {
+            Swal.fire({
+                title: title,
+                text: message,
+                showCancelButton: true,
+                confirmButtonColor: '#1e1e2d',
+                cancelButtonColor: '#f1f1f1',
+                confirmButtonText: 'Ya, Kirim',
+                cancelButtonText: 'Cek Kembali',
+                reverseButtons: true,
+                customClass: {
+                    title: 'text-lg font-bold text-gray-800',
+                    htmlContainer: 'text-sm text-gray-500',
+                    confirmButton: 'px-6 py-2 rounded-md font-semibold text-white text-xs uppercase tracking-wider',
+                    cancelButton: 'px-6 py-2 rounded-md font-semibold text-gray-600 text-xs uppercase tracking-wider'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(formId).submit();
+                }
+            });
+        }
+    </script>
 </html>

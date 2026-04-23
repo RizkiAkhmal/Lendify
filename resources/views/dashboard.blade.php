@@ -11,13 +11,28 @@
         <!-- Welcome + Stats Combined -->
         <div class="card-metronic overflow-hidden border-0 shadow-sm bg-white">
             <div class="p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div>
-                    <h1 class="text-xl font-bold text-gray-900">
-                        Selamat Datang, <span class="text-[#009ef7]">{{ Auth::user()->name }}</span>!
-                    </h1>
-                    <p class="text-sm text-gray-500 mt-1">
-                        Kelola peminjaman alat praktik dengan mudah.
-                    </p>
+                <div class="flex items-center gap-4">
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">
+                            Selamat Datang, <span class="text-[#009ef7]">{{ Auth::user()->name }}</span>!
+                        </h1>
+                        <p class="text-sm text-gray-500 mt-1">
+                            Kelola peminjaman alat praktik dengan mudah.
+                        </p>
+                    </div>
+                    @php
+                        $cartItems = session()->get('cart', []);
+                        $cartCount = array_sum(array_column($cartItems, 'jumlah'));
+                    @endphp
+                    <a href="{{ route('peminjam.cart.index') }}" class="relative group flex items-center gap-2 px-5 py-2.5 bg-indigo-50 text-indigo-600 rounded-xl font-bold text-sm hover:bg-indigo-600 hover:text-white transition-all shadow-sm border border-indigo-100">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        Lihat Keranjang
+                        @if($cartCount > 0)
+                            <span class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-[10px] border-2 border-white shadow-sm group-hover:scale-110 transition-transform cart-badge">
+                                {{ $cartCount }}
+                            </span>
+                        @endif
+                    </a>
                 </div>
             </div>
             <!-- Stats Row -->
@@ -80,10 +95,13 @@
                             </div>
                             <div class="p-3 flex flex-col flex-1">
                                 <h4 class="font-bold text-gray-900 text-sm truncate" title="{{ $alat->nama_alat }}">{{ $alat->nama_alat }}</h4>
-                                <p class="text-[10px] text-gray-400 mt-0.5">{{ $alat->merk ?? 'Tanpa Merk' }} &middot; <span class="capitalize">{{ str_replace('_', ' ', $alat->kondisi) }}</span></p>
-                                <div class="mt-auto pt-3">
-                                    <a href="{{ route('peminjam.katalog.show', $alat) }}" class="flex items-center justify-center w-full px-3 py-2 bg-gray-900 text-white rounded-lg text-xs font-bold hover:bg-[#009ef7] transition">
-                                        Pinjam
+                                <p class="text-[10px] text-gray-400 mt-0.5">{{ $alat->merk ?? 'Tanpa Merk' }}</p>
+                                <div class="mt-auto pt-3 flex items-center justify-between gap-2">
+                                    <button onclick="addToCart({{ $alat->id }})" class="p-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-[#009ef7] hover:text-white transition shadow-sm group/btn shrink-0" title="Tambah ke Keranjang">
+                                        <svg class="w-4 h-4 transition-transform group-hover/btn:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                                    </button>
+                                    <a href="{{ route('peminjam.katalog.show', $alat) }}" class="flex items-center justify-center flex-1 px-3 py-2 bg-gray-900 text-white rounded-lg text-xs font-bold hover:bg-[#009ef7] transition">
+                                        Detail
                                     </a>
                                 </div>
                             </div>
@@ -199,9 +217,9 @@
                     @endif
                 </div>
             </div>
-            <div class="bg-gray-50/50 px-8 py-3 border-t border-gray-100">
+            <!-- <div class="bg-gray-50/50 px-8 py-3 border-t border-gray-100">
                 <p class="text-[10px] text-gray-400 font-medium">Data diperbaharui otomatis setiap terjadi pengembalian alat dengan denda.</p>
-            </div>
+            </div> -->
         </div>
         <!-- Recent Data Sections -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
@@ -261,7 +279,7 @@
             <div class="card-metronic bg-white border border-gray-100 flex flex-col">
                 <div class="p-6 border-b border-gray-50 flex items-center justify-between">
                     <h3 class="font-bold text-gray-800">Stok Alat Terbaru</h3>
-                    <a href="{{ route(Auth::user()->role === 'admin' ? 'admin.alat.index' : 'petugas.katalog') }}" class="text-xs font-bold text-[#009ef7] hover:underline">Lihat Semua</a>
+                    <a href="{{ route(Auth::user()->role === 'admin' ? 'admin.alat.index' : 'petugas.katalog.index') }}" class="text-xs font-bold text-[#009ef7] hover:underline">Lihat Semua</a>
                 </div>
                 <div class="p-0 overflow-x-auto">
                     <table class="w-full text-left text-sm">
@@ -313,4 +331,65 @@
     @endif
 
     </div>
+
+    <!-- AJAX Add to Cart Logic (Dashboard) -->
+    @if(Auth::user()->role === 'peminjam')
+    <script>
+        function addToCart(alatId) {
+            fetch(`/peminjam/cart/${alatId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ jumlah: 1 })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    let cartBadges = document.querySelectorAll('.cart-badge');
+                    cartBadges.forEach(badge => {
+                        badge.textContent = data.cartCount;
+                        badge.classList.remove('hidden');
+                    });
+
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: 'Barang berhasil dimasukkan ke keranjang.',
+                        icon: 'success',
+                        confirmButtonColor: '#009ef7',
+                        confirmButtonText: 'Lanjut',
+                        timer: 2000,
+                        timerProgressBar: true,
+                        customClass: {
+                            title: 'text-lg font-bold text-gray-800',
+                            confirmButton: 'px-6 py-2 rounded-md font-semibold text-white text-xs uppercase tracking-wider'
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Gagal',
+                        text: data.message,
+                        icon: 'error',
+                        confirmButtonColor: '#f1416c',
+                        confirmButtonText: 'Tutup'
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Kesalahan Sistem',
+                    text: 'Terjadi masalah pada jaringan atau server kami.',
+                    icon: 'warning',
+                    confirmButtonColor: '#f1f1f1',
+                    confirmButtonText: 'Tutup',
+                    customClass: {
+                        confirmButton: 'text-gray-800 px-6 py-2 rounded-md font-semibold text-xs uppercase tracking-wider'
+                    }
+                });
+            });
+        }
+    </script>
+    @endif
 </x-app-layout>

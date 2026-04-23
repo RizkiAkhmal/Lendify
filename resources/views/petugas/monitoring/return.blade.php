@@ -36,7 +36,7 @@
 
                         <div>
                             <h3 class="text-xl font-bold mb-4">Form Pengembalian</h3>
-                            <form action="{{ route('petugas.monitoring.return', $peminjaman) }}" method="POST" onsubmit="return confirm('Proses pengembalian ini?')">
+                             <form id="return-form" action="{{ route('petugas.monitoring.return', $peminjaman) }}" method="POST">
                                 @csrf
                                 
                                 <div class="mb-4">
@@ -60,19 +60,19 @@
                                     <textarea id="catatan" name="catatan" rows="3" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"></textarea>
                                 </div>
 
-                                <div class="bg-gray-100 p-4 rounded-lg mb-6">
-                                    <div class="flex justify-between items-center font-bold text-lg">
+                                <div class="bg-gray-100 p-4 rounded-lg mb-6 border border-gray-200">
+                                    <div class="flex justify-between items-center font-bold text-lg text-gray-800">
                                         <span>Total Denda Bayar:</span>
                                         <span id="total_bayar">Rp {{ number_format($denda_keterlambatan, 0, ',', '.') }}</span>
                                     </div>
-                                    <div id="denda_detail" class="text-[10px] text-gray-500 mt-1">
+                                    <div id="denda_detail" class="text-[10px] text-gray-500 mt-1 uppercase tracking-tighter">
                                         * Denda Telat: Rp {{ number_format($denda_keterlambatan, 0, ',', '.') }}
                                     </div>
                                 </div>
 
-                                <div class="flex justify-between">
-                                    <a href="{{ route('petugas.monitoring.index') }}" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">Batal</a>
-                                    <button type="submit" class="px-6 py-2 bg-green-600 text-white rounded font-bold hover:bg-green-700">
+                                <div class="flex justify-between items-center">
+                                    <a href="{{ route('petugas.monitoring.index') }}" class="text-sm font-bold text-gray-400 hover:text-gray-600 transition">Batal</a>
+                                    <button type="button" onclick="confirmSubmit('return-form', 'Selesaikan Pengembalian?', 'Pastikan kondisi alat dan jumlah denda yang diterima sudah benar.')" class="px-8 py-3 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition shadow-lg shadow-green-100">
                                         Simpan & Selesai
                                     </button>
                                 </div>

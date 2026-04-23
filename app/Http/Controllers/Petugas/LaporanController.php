@@ -11,7 +11,7 @@ class LaporanController extends Controller
     public function index(Request $request)
     {
         $query = Peminjaman::with(['user', 'alat', 'pengembalian'])
-            ->where('status', 'selesai')
+            ->whereIn('status', ['selesai', 'rejected'])
             ->latest();
 
         if ($request->has('start_date') && $request->start_date != '') {
@@ -31,7 +31,7 @@ class LaporanController extends Controller
     {
         // Simple CSV Export
         $query = Peminjaman::with(['user', 'alat', 'pengembalian'])
-            ->where('status', 'selesai')
+            ->whereIn('status', ['selesai', 'rejected'])
             ->latest();
 
         if ($request->has('start_date') && $request->start_date != '') {
@@ -50,22 +50,29 @@ class LaporanController extends Controller
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
 
-        fputcsv($handle, ['ID', 'Peminjam', 'Alat', 'Tgl Pinjam', 'Tgl Kembali', 'Terlambat (Hari)', 'Denda', 'Kondisi Akhir']);
+        fputcsv($handle, ['ID Transaksi', 'Peminjam', 'Email', 'Alat', 'Jumlah', 'Tgl Pinjam', 'Tgl Kembali Aktual', 'Keterlambatan (Hari)', 'Denda Keterlambatan', 'Total Denda', 'Kondisi Akhir', 'Catatan Petugas']);
 
         foreach ($data as $row) {
-            $denda = $row->pengembalian ? $row->pengembalian->denda : 0;
-            $telat = $row->pengembalian ? $row->pengembalian->keterlambatan_hari : 0;
-            $kondisi = $row->pengembalian ? $row->pengembalian->kondisi_alat : '-';
+            $p = $row->pengembalian;
+            $dendaTotal = $p ? $p->denda : 0;
+            $telat = $p ? $p->keterlambatan_hari : 0;
+            $dendaTelat = $telat * 5000;
+            $kondisi = $p ? str_replace('_', ' ', $p->kondisi_alat) : 'N/A';
+            $tglKembali = ($p && $p->tanggal_kembali_aktual) ? $p->tanggal_kembali_aktual->format('d/m/Y H:i') : '-';
 
             fputcsv($handle, [
                 $row->id,
-                $row->user->name,
-                $row->alat->nama_alat,
-                $row->tanggal_peminjaman,
-                $row->tanggal_kembali_aktual,
-                $telat,
-                $denda,
-                $kondisi
+                strtoupper($row->user->name),
+                $row->user->email,
+                strtoupper($row->alat->nama_alat),
+                $row->jumlah,
+                $row->tanggal_pinjam ? $row->tanggal_pinjam->format('d/m/Y H:i') : '-',
+                $tglKembali,
+                $telat . ' Hari',
+                'Rp ' . number_format($dendaTelat, 0, ',', '.'),
+                'Rp ' . number_format($dendaTotal, 0, ',', '.'),
+                strtoupper($kondisi),
+                $p->catatan ?? '-'
             ]);
         }
 

@@ -52,16 +52,7 @@
                             <x-input-error :messages="$errors->get('spesifikasi')" class="mt-2" />
                         </div>
 
-                        <!-- Kondisi -->
-                        <div class="mt-4">
-                            <x-input-label for="kondisi" :value="__('Kondisi')" />
-                            <select id="kondisi" name="kondisi" class="block mt-1 w-full rounded-md shadow-sm border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-                                <option value="baik" {{ old('kondisi', $alat->kondisi) == 'baik' ? 'selected' : '' }}>Baik</option>
-                                <option value="rusak_ringan" {{ old('kondisi', $alat->kondisi) == 'rusak_ringan' ? 'selected' : '' }}>Rusak Ringan</option>
-                                <option value="rusak_berat" {{ old('kondisi', $alat->kondisi) == 'rusak_berat' ? 'selected' : '' }}>Rusak Berat</option>
-                            </select>
-                            <x-input-error :messages="$errors->get('kondisi')" class="mt-2" />
-                        </div>
+
 
                         <!-- Jumlah Total -->
                         <div class="mt-4">
@@ -75,7 +66,7 @@
                         <div class="mt-4">
                             <x-input-label for="jumlah_rusak" :value="__('Jumlah Unit Rusak')" />
                             <x-text-input id="jumlah_rusak" class="block mt-1 w-full" type="number" name="jumlah_rusak" :value="old('jumlah_rusak', $alat->jumlah_rusak)" required min="0" />
-                            <p class="text-xs text-gray-400 mt-1 italic">Unit yang sedang dalam masa perbaikan (tidak dapat dipinjam).</p>
+                            <p class="text-xs text-gray-400 mt-1 italic">Unit yang sedang dalam masa perbaikan.</p>
                             <x-input-error :messages="$errors->get('jumlah_rusak')" class="mt-2" />
                         </div>
                         

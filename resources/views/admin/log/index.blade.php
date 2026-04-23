@@ -19,7 +19,7 @@
                         <th class="px-6 py-4">User</th>
                         <th class="px-6 py-4">Aksi</th>
                         <th class="px-6 py-4">Tabel</th>
-                        <th class="px-6 py-4">Meta</th>
+                        <!-- <th class="px-6 py-4">Meta</th> -->
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100 bg-white">
@@ -58,9 +58,9 @@
                                 <span class="text-xs font-bold text-gray-700 uppercase">{{ $log->tabel }}</span>
                             </td>
                             <td class="px-6 py-4 text-xs text-gray-400">
-                                <div class="max-w-[200px] truncate" title="{{ $log->ip_address }} | {{ $log->user_agent }}">
+                                <!-- <div class="max-w-[200px] truncate" title="{{ $log->ip_address }} | {{ $log->user_agent }}">
                                     IP: {{ $log->ip_address }}
-                                </div>
+                                </div> -->
                             </td>
                         </tr>
                     @empty

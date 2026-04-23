@@ -14,6 +14,12 @@ class PengembalianController extends Controller
         return view('admin.pengembalian.index', compact('pengembalian'));
     }
 
+    public function show(Pengembalian $pengembalian)
+    {
+        $pengembalian->load(['peminjaman.user', 'peminjaman.alat', 'peminjaman.petugas']);
+        return view('admin.pengembalian.show', compact('pengembalian'));
+    }
+
     public function export()
     {
         $pengembalian = Pengembalian::with(['peminjaman.user', 'peminjaman.alat'])->get();
@@ -24,12 +30,12 @@ class PengembalianController extends Controller
         foreach ($pengembalian as $item) {
             fputcsv($handle, [
                 $item->id,
-                $item->peminjaman->user->name ?? '-',
-                $item->peminjaman->alat->nama_alat ?? '-',
-                $item->tanggal_kembali_aktual,
-                $item->kondisi_alat,
-                $item->keterlambatan_hari,
-                $item->denda,
+                strtoupper($item->peminjaman->user->name ?? '-'),
+                strtoupper($item->peminjaman->alat->nama_alat ?? '-'),
+                $item->tanggal_kembali_aktual ? $item->tanggal_kembali_aktual->format('d/m/Y H:i') : '-',
+                strtoupper(str_replace('_', ' ', $item->kondisi_alat)),
+                $item->keterlambatan_hari . ' Hari',
+                'Rp ' . number_format($item->denda, 0, ',', '.'),
                 $item->catatan
             ]);
         }

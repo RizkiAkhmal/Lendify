@@ -9,8 +9,23 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <form method="POST" action="{{ route('admin.kategori.store') }}">
+                    <form method="POST" action="{{ route('admin.kategori.store') }}" novalidate>
                         @csrf
+
+                        @if($errors->any())
+                        <div class="mb-8 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center animate-shake">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-red-700 font-bold">
+                                    Kategori gagal dibuat. Silakan isi Nama Kategori sebelum menyimpan.
+                                </p>
+                            </div>
+                        </div>
+                        @endif
 
                         <!-- Nama Kategori -->
                         <div>

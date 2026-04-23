@@ -17,7 +17,6 @@ class Alat extends Model
         'nama_alat',
         'merk',
         'spesifikasi',
-        'kondisi',
         'jumlah_total',
         'jumlah_tersedia',
         'jumlah_rusak',
@@ -51,16 +50,7 @@ class Alat extends Model
      */
     public function scopeTersedia($query)
     {
-        return $query->where('jumlah_tersedia', '>', 0)
-                     ->where('kondisi', '!=', 'rusak_berat');
-    }
-
-    /**
-     * Scope: Alat dengan kondisi baik
-     */
-    public function scopeKondisiBaik($query)
-    {
-        return $query->where('kondisi', 'baik');
+        return $query->where('jumlah_tersedia', '>', 0);
     }
 
     /**

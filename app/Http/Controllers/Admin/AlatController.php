@@ -30,15 +30,14 @@ class AlatController extends Controller
             'nama_alat' => ['required', 'string', 'max:255'],
             'merk' => ['nullable', 'string', 'max:100'],
             'spesifikasi' => ['nullable', 'string'],
-            'kondisi' => ['required', 'in:baik,rusak_ringan,rusak_berat'],
             'jumlah_total' => ['required', 'integer', 'min:0'],
-            'jumlah_rusak' => ['required', 'integer', 'min:0'],
             'foto' => ['nullable', 'image', 'max:2048'], // 2MB Max
         ]);
 
         $data = $request->all();
-        // Initial available = total - initially broken
-        $data['jumlah_tersedia'] = max(0, $request->jumlah_total - $request->jumlah_rusak);
+        $data['jumlah_rusak'] = 0;
+        // Initial available = total
+        $data['jumlah_tersedia'] = $request->jumlah_total;
 
         if ($request->hasFile('foto')) {
             $path = $request->file('foto')->store('alat', 'public');
@@ -47,7 +46,7 @@ class AlatController extends Controller
 
         Alat::create($data);
 
-        return redirect()->route('admin.alat.index')->with('success', 'Alat created successfully.');
+        return redirect()->route('admin.alat.index')->with('success', 'Alat berhasil ditambahkan.');
     }
 
     public function show(Alat $alat)
@@ -69,7 +68,6 @@ class AlatController extends Controller
             'nama_alat' => ['required', 'string', 'max:255'],
             'merk' => ['nullable', 'string', 'max:100'],
             'spesifikasi' => ['nullable', 'string'],
-            'kondisi' => ['required', 'in:baik,rusak_ringan,rusak_berat'],
             'jumlah_total' => ['required', 'integer', 'min:0'],
             'jumlah_rusak' => ['required', 'integer', 'min:0'],
             'foto' => ['nullable', 'image', 'max:2048'],
@@ -98,13 +96,19 @@ class AlatController extends Controller
 
         $alat->update($data);
 
-        return redirect()->route('admin.alat.index')->with('success', 'Alat updated successfully.');
+        return redirect()->route('admin.alat.index')->with('success', 'Alat Berhasil Diperbarui.');
     }
 
     public function destroy(Alat $alat)
     {
-        if ($alat->peminjaman()->where('status', 'dipinjam')->exists()) {
-              return back()->with('error', 'Cannot delete alat that is currently borrowed.');
+        // 1. Check if tool is currently being borrowed
+        if ($alat->peminjaman()->whereIn('status', ['approved', 'dipinjam'])->exists()) {
+              return back()->with('error', 'Alat tidak dapat dihapus karena sedang dalam proses peminjaman aktif.');
+        }
+
+        // 2. Check for historical records that prevent deletion due to FK Restrict
+        if ($alat->peminjaman()->exists()) {
+            return back()->with('error', 'Alat tidak dapat dihapus karena memiliki riwayat transaksi di masa lalu. Anda dapat mengubah statusnya menjadi tidak aktif jika diperlukan.');
         }
 
         if ($alat->foto) {
@@ -112,7 +116,7 @@ class AlatController extends Controller
         }
         
         $alat->delete();
-        return redirect()->route('admin.alat.index')->with('success', 'Alat deleted successfully.');
+        return redirect()->route('admin.alat.index')->with('success', 'Alat berhasil dihapus');
     }
 
     public function export()
@@ -120,7 +124,7 @@ class AlatController extends Controller
         $alats = Alat::with('kategori')->get();
         $filename = "alat-" . date('Y-m-d') . ".csv";
         $handle = fopen('php://memory', 'w');
-        fputcsv($handle, ['ID', 'Kode Alat', 'Nama Alat', 'Kategori', 'Merk', 'Kondisi', 'Stok Total', 'Stok Tersedia', 'Stok Rusak']);
+        fputcsv($handle, ['ID', 'Kode Alat', 'Nama Alat', 'Kategori', 'Merk', 'Stok Total', 'Stok Tersedia', 'Stok Rusak']);
 
         foreach ($alats as $alat) {
             fputcsv($handle, [
@@ -129,7 +133,6 @@ class AlatController extends Controller
                 $alat->nama_alat,
                 $alat->kategori->nama_kategori ?? '-',
                 $alat->merk,
-                $alat->kondisi,
                 $alat->jumlah_total,
                 $alat->jumlah_tersedia,
                 $alat->jumlah_rusak
@@ -161,11 +164,6 @@ class AlatController extends Controller
 
         $alat->decrement('jumlah_rusak', $request->jumlah);
         $alat->increment('jumlah_tersedia', $request->jumlah);
-
-        // Update overall condition if necessary
-        if ($alat->jumlah_rusak == 0) {
-            $alat->update(['kondisi' => 'baik']);
-        }
 
         \App\Models\LogAktivitas::catat(auth()->id(), 'REPAIR', 'alat', null, [
             'nama_alat' => $alat->nama_alat,

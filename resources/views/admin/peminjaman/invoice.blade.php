@@ -32,16 +32,13 @@
 </head>
 <body>
 
-    <div class="no-print">
-        <a href="javascript:window.print()" class="btn-print">Cetak Invoice</a>
-        <a href="{{ route('admin.peminjaman.show', $peminjaman) }}" class="btn-back">Kembali</a>
-    </div>
+
 
     <div class="invoice-box">
         <div class="header">
             <div>
                 <h1>LENDIFY</h1>
-                <p>Sistem Peminjaman Alat Praktik<br>SMK Negeri XYZ<br>Email: support@lendify.edu</p>
+                <p>Sistem Peminjaman Alat Praktik<br>Email: support@lendify</p>
             </div>
             <div style="text-align: right;">
                 <h2 style="margin: 0;">INVOICE</h2>
@@ -81,8 +78,8 @@
                         <small>{{ $peminjaman->alat->kode_alat }} | {{ $peminjaman->alat->merk ?? 'Tanpa Merk' }}</small>
                     </td>
                     <td>{{ $peminjaman->jumlah }} Unit</td>
-                    <td>{{ $peminjaman->tanggal_pinjam ?? '-' }}</td>
-                    <td>{{ $peminjaman->tanggal_kembali_rencana }}</td>
+                    <td>{{ $peminjaman->tanggal_peminjaman ? \Carbon\Carbon::parse($peminjaman->tanggal_peminjaman)->format('d/m/Y') : '-' }}</td>
+                    <td>{{ $peminjaman->tanggal_kembali_rencana ? \Carbon\Carbon::parse($peminjaman->tanggal_kembali_rencana)->format('d/m/Y') : '-' }}</td>
                 </tr>
             </tbody>
         </table>
@@ -100,7 +97,7 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>{{ $peminjaman->pengembalian->tanggal_kembali_aktual->format('d/m/Y H:i') }}</td>
+                        <td>{{ $peminjaman->pengembalian && $peminjaman->pengembalian->tanggal_kembali_aktual ? $peminjaman->pengembalian->tanggal_kembali_aktual->format('d/m/Y H:i') : '-' }}</td>
                         <td style="text-transform: capitalize;">{{ str_replace('_', ' ', $peminjaman->pengembalian->kondisi_alat) }}</td>
                         <td>{{ $peminjaman->pengembalian->keterlambatan_hari }} Hari</td>
                         <td>Rp {{ number_format($peminjaman->pengembalian->denda, 0, ',', '.') }}</td>

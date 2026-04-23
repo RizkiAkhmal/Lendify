@@ -77,10 +77,7 @@ class MonitoringController extends Controller
                 $peminjaman->alat->increment('jumlah_rusak', $peminjaman->jumlah);
             }
             
-            // If unique item (count 1), update condition
-            if ($peminjaman->alat->jumlah_total == 1) {
-                $peminjaman->alat->update(['kondisi' => $request->kondisi_akhir]);
-            }
+            // 'kondisi' field is completely removed, rely only on jumlah calculations
 
             \App\Models\LogAktivitas::catat(Auth::id(), 'RETURN', 'pengembalian', null, $pengembalian->toArray());
         });

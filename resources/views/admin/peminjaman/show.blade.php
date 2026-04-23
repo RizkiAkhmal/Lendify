@@ -41,16 +41,20 @@
                             <h3 class="text-lg font-medium text-gray-900 mb-4">Detail Peminjaman</h3>
                             <div class="bg-gray-50 p-4 rounded-lg grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
-                                    <p class="text-sm text-gray-600">Tanggal Pinjam</p>
+                                    <p class="text-sm text-gray-600">Tanggal Pinjam (Rencana)</p>
                                     <p class="font-semibold">{{ $peminjaman->tanggal_peminjaman ? $peminjaman->tanggal_peminjaman->format('d M Y') : '-' }}</p>
                                 </div>
                                 <div>
+                                    <p class="text-sm text-gray-600">Waktu Ambil (Aktual)</p>
+                                    <p class="font-semibold">{{ $peminjaman->tanggal_pinjam ? $peminjaman->tanggal_pinjam->translatedFormat('d M Y, H:i') : '-' }}</p>
+                                </div>
+                                <div>
                                     <p class="text-sm text-gray-600">Rencana Kembali</p>
-                                    <p class="font-semibold">{{ $peminjaman->tanggal_kembali_rencana }}</p>
+                                    <p class="font-semibold">{{ $peminjaman->tanggal_kembali_rencana ? \Carbon\Carbon::parse($peminjaman->tanggal_kembali_rencana)->format('d M Y') : '-' }}</p>
                                 </div>
                                 <div>
                                     <p class="text-sm text-gray-600">Tanggal Kembali Aktual</p>
-                                    <p class="font-semibold">{{ $peminjaman->pengembalian->tanggal_kembali_aktual ? $peminjaman->pengembalian->tanggal_kembali_aktual->format('d M Y') : '-' }}</p>
+                                    <p class="font-semibold">{{ $peminjaman->pengembalian && $peminjaman->pengembalian->tanggal_kembali_aktual ? $peminjaman->pengembalian->tanggal_kembali_aktual->format('d M Y') : '-' }}</p>
                                 </div>
                                 <div>
                                     <p class="text-sm text-gray-600">Status</p>
@@ -75,10 +79,6 @@
                     </div>
 
                     <div class="mt-8 flex justify-end gap-3">
-                        <a href="{{ route('admin.peminjaman.invoice', $peminjaman) }}" class="px-5 py-2 bg-[#009ef7] text-white rounded-md font-bold hover:bg-[#0086d1] transition shadow-sm flex items-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                            Print Invoice
-                        </a>
                         <a href="{{ route('admin.peminjaman.index') }}" class="px-5 py-2 bg-gray-200 text-gray-800 rounded-md font-bold hover:bg-gray-300 transition">Back to List</a>
                     </div>
                 </div>
